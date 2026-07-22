@@ -11,17 +11,17 @@ type Config struct {
 	Port     int
 	User     string
 	Password string
-	DBName   string
+	Name     string
 	SSLMode  string
 }
 
-func NewConfig(host string, port int, user string, password string, dbName string, sslMode string) Config {
+func NewConfig(host string, port int, user string, password string, Name string, sslMode string) Config {
 	return Config{
 		Host:     host,
 		Port:     port,
 		User:     user,
 		Password: password,
-		DBName:   dbName,
+		Name:     Name,
 		SSLMode:  sslMode,
 	}
 }
@@ -37,7 +37,7 @@ func NewConfigFromEnv() (Config, error) {
 		Port:     port,
 		User:     os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
-		DBName:   os.Getenv("POSTGRES_DBNAME"),
+		Name:     os.Getenv("POSTGRES_NAME"),
 		SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
 	}, nil
 }
