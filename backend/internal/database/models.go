@@ -13,14 +13,6 @@ type Area struct {
 	GoalScorers  []GoalScorer `gorm:"foreignKey:NationalityAreaID"`
 }
 
-type Stadium struct {
-	StadiumID int `gorm:"primaryKey"`
-	Name      string
-
-	Teams   []Team
-	Matches []Match
-}
-
 type Competition struct {
 	CompetitionID int `gorm:"primaryKey"`
 
@@ -34,19 +26,6 @@ type Competition struct {
 	Editions []Edition
 }
 
-type Edition struct {
-	EditionID int `gorm:"primaryKey"`
-
-	CompetitionID int
-	Competition   Competition
-
-	StartYear int
-	Status    string
-
-	Matches     []Match
-	GoalScorers []GoalScorer
-}
-
 type Team struct {
 	TeamID int `gorm:"primaryKey"`
 
@@ -55,16 +34,25 @@ type Team struct {
 	Code      string
 	Colors    string
 
-	StadiumID *int
-	Stadium   *Stadium
-
-	AreaID int
-	Area   Area
+	Stadium string
+	AreaID  int
+	Area    Area
 
 	HomeMatches []Match `gorm:"foreignKey:HomeTeamID"`
 	AwayMatches []Match `gorm:"foreignKey:AwayTeamID"`
 
 	GoalScorers []GoalScorer
+}
+
+type Edition struct {
+	CompetitionID int `gorm:"primaryKey"`
+	Competition   Competition
+
+	StartYear int `gorm:"primaryKey"`
+	Status    string
+
+	Matches     []Match      `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
+	GoalScorers []GoalScorer `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 }
 
 type Match struct {
@@ -76,11 +64,10 @@ type Match struct {
 	AwayTeamID int
 	AwayTeam   Team `gorm:"foreignKey:AwayTeamID"`
 
-	StadiumID *int
-	Stadium   *Stadium
+	CompetitionID   int
+	StartSeasonYear int
 
-	EditionID int
-	Edition   Edition
+	Edition Edition `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 
 	HomeGoals *int
 	AwayGoals *int
@@ -98,15 +85,15 @@ type GoalScorer struct {
 	TeamID int
 	Team   Team
 
-	EditionID int
-	Edition   Edition
+	CompetitionID   int `gorm:"primaryKey"`
+	StartSeasonYear int `gorm:"primaryKey"`
+
+	Edition Edition `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 
 	Name string
 
 	NationalityAreaID int
 	NationalityArea   Area `gorm:"foreignKey:NationalityAreaID"`
-
-	Position string
 
 	Goals            int
 	Assists          int
