@@ -6,12 +6,6 @@ CREATE TABLE areas (
     is_country BOOLEAN DEFAULT TRUE NOT NULL
 );
 
-CREATE TABLE stadiums (
-    stadium_id INTEGER PRIMARY KEY,
-
-    name VARCHAR(255) NOT NULL UNIQUE
-);
-
 CREATE TABLE competitions (
     competition_id INTEGER PRIMARY KEY,
 
@@ -41,7 +35,8 @@ CREATE TABLE teams (
     code VARCHAR(255) NOT NULL UNIQUE,
     colors VARCHAR(255),
 
-    stadium_id INTEGER REFERENCES stadiums(stadium_id),
+    stadium VARCHAR(255) NOT NULL,
+,
     area_id INTEGER NOT NULL REFERENCES areas(area_id)
 );
 
@@ -50,7 +45,6 @@ CREATE TABLE matches (
 
     home_team_id INTEGER NOT NULL REFERENCES teams(team_id),
     away_team_id INTEGER NOT NULL REFERENCES teams(team_id),
-    stadium_id INTEGER REFERENCES stadiums(stadium_id),
     edition_id INTEGER NOT NULL REFERENCES editions(edition_id),
 
     home_goals INTEGER,
