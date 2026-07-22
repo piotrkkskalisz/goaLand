@@ -1,8 +1,4 @@
-# Simple Makefile for a Go project
-
-# Create .env file from .env.example file
-env:
-	@cp -n .env.example .env
+# Simple Makefile for a Go
 
 # Build the application
 build:
@@ -13,15 +9,6 @@ build:
 # Run the application
 run:
 	@go run cmd/api/main.go
-
-# Create DB container
-docker-up:
-	@docker compose up --build
-		
-
-# Shutdown DB container
-docker-down:
-	@docker compose down
 
 # Test the application
 test:
