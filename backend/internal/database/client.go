@@ -77,3 +77,39 @@ func (c *Client) Get(ctx context.Context, dest any, filter Filter, preloads ...s
 func (c *Client) DB() *gorm.DB {
 	return c.db
 }
+
+func (c *Client) GetArea(ctx context.Context, id int, preloads ...string) (*Area, error) {
+	var area Area
+	err := c.Get(ctx, &area, Filter{"area_id": id}, preloads...)
+	return &area, err
+}
+
+func (c *Client) GetCompetition(ctx context.Context, id int, preloads ...string) (*Competition, error) {
+	var competition Competition
+	err := c.Get(ctx, &competition, Filter{"competition_id": id}, preloads...)
+	return &competition, err
+}
+
+func (c *Client) GetTeam(ctx context.Context, id int, preloads ...string) (*Team, error) {
+	var team Team
+	err := c.Get(ctx, &team, Filter{"team_id": id}, preloads...)
+	return &team, err
+}
+
+func (c *Client) GetMatch(ctx context.Context, id int, preloads ...string) (*Match, error) {
+	var match Match
+	err := c.Get(ctx, &match, Filter{"match_id": id}, preloads...)
+	return &match, err
+}
+
+func (c *Client) GetGoalScorer(ctx context.Context, id int, preloads ...string) (*GoalScorer, error) {
+	var scorer GoalScorer
+	err := c.Get(ctx, &scorer, Filter{"goal_scorer_id": id}, preloads...)
+	return &scorer, err
+}
+
+func (c *Client) GetEdition(ctx context.Context, competitionID, startYear int, preloads ...string) (*Edition, error) {
+	var edition Edition
+	err := c.Get(ctx, &edition, Filter{"competition_id": competitionID, "start_year": startYear}, preloads...)
+	return &edition, err
+}
