@@ -31,12 +31,14 @@ func TestDatabaseIntegrity(t *testing.T) {
 
 	match.StartTime = time.Now()
 
-	require.NoError(t, client.SaveAreas([]db.Area{area}))
-	require.NoError(t, client.SaveCompetitions([]db.Competition{competition}))
-	require.NoError(t, client.SaveTeams([]db.Team{team, secondTeam}))
-	require.NoError(t, client.SaveEdition(edition))
-	require.NoError(t, client.SaveMatches([]db.Match{match}))
-	require.NoError(t, client.SaveGoalScorers([]db.GoalScorer{goalScorer}))
+	ctx := t.Context()
+
+	require.NoError(t, client.Save(ctx, []db.Area{area}))
+	require.NoError(t, client.Save(ctx, []db.Competition{competition}))
+	require.NoError(t, client.Save(ctx, []db.Team{team, secondTeam}))
+	require.NoError(t, client.Save(ctx, edition))
+	require.NoError(t, client.Save(ctx, []db.Match{match}))
+	require.NoError(t, client.Save(ctx, []db.GoalScorer{goalScorer}))
 
 	var loadedEdition db.Edition
 	require.NoError(t, client.DB().

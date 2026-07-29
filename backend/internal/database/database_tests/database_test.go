@@ -27,7 +27,7 @@ func TestNewClientFromEnv(t *testing.T) {
 func saveAndAssertAreas(t *testing.T, client *db.Client, areas []db.Area) {
 	t.Helper()
 
-	require.NoError(t, client.SaveAreas(areas))
+	require.NoError(t, client.Save(t.Context(), areas))
 
 	var saved []db.Area
 	require.NoError(t, client.DB().Find(&saved).Error)
