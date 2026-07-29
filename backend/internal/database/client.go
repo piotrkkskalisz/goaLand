@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -8,9 +9,17 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	PreloadArea     = "Area"
+	PreloadEditions = "Editions"
+	PreloadMatches  = "Matches"
+)
+
 type Client struct {
 	db *gorm.DB
 }
+
+type Filter map[string]any
 
 func NewClient(config Config) (*Client, error) {
 	dsn := fmt.Sprintf(
@@ -36,41 +45,33 @@ func NewClientFromEnv() (*Client, error) {
 
 	return NewClient(config)
 }
-
-func (c *Client) SaveAreas(areas []Area) error {
+func (c *Client) Save(ctx context.Context, data any) error {
 	return c.db.
+		WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&areas).Error
+		Create(data).
+		Error
 }
 
-func (c *Client) SaveCompetitions(competitions []Competition) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&competitions).Error
+func (c *Client) buildQuery(ctx context.Context, preloads []string) *gorm.DB {
+	query := c.db.WithContext(ctx)
+
+	for _, preload := range preloads {
+		query = query.Preload(preload)
+	}
+	return query
+
 }
 
-func (c *Client) SaveEdition(edition Edition) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&edition).Error
+func (c *Client) List(ctx context.Context, dest any, preloads ...string) error {
+	return c.buildQuery(ctx, preloads).Find(dest).Error
 }
 
-func (c *Client) SaveTeams(teams []Team) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&teams).Error
-}
-
-func (c *Client) SaveMatches(matches []Match) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&matches).Error
-}
-
-func (c *Client) SaveGoalScorers(goalScorers []GoalScorer) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&goalScorers).Error
+func (c *Client) Get(ctx context.Context, dest any, filter Filter, preloads ...string) error {
+	return c.buildQuery(ctx, preloads).
+		Where(filter).
+		First(dest).
+		Error
 }
 
 func (c *Client) DB() *gorm.DB {
