@@ -3,6 +3,7 @@ package sync
 import (
 	"backend/internal/api"
 	"backend/internal/database"
+	"context"
 )
 
 type SeasonTarget struct {
@@ -34,12 +35,7 @@ type API interface {
 }
 
 type Database interface {
-	SaveAreas([]database.Area) error
-	SaveCompetitions([]database.Competition) error
-	SaveEdition(database.Edition) error
-	SaveTeams([]database.Team) error
-	SaveMatches([]database.Match) error
-	SaveGoalScorers([]database.GoalScorer) error
+	Save(context.Context, any) error
 }
 
 type Sync struct {

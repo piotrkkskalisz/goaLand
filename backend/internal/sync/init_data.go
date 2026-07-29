@@ -4,6 +4,7 @@ import (
 	"backend/internal/api"
 	"backend/internal/database"
 	"backend/internal/utils"
+	"context"
 	"fmt"
 	"maps"
 	"time"
@@ -18,29 +19,29 @@ func intOrZero(value *int) int {
 	return *value
 }
 
-func (s *Sync) InitializeData(targets SeasonTargets) error {
-	if err := s.initAreas(); err != nil {
+func (s *Sync) InitializeData(ctx context.Context, targets SeasonTargets) error {
+	if err := s.initAreas(ctx); err != nil {
 		return err
 	}
 
-	if err := s.initCompetitions(targets.competitionCodes()); err != nil {
+	if err := s.initCompetitions(ctx, targets.competitionCodes()); err != nil {
 		return err
 	}
 
 	for _, target := range targets {
-		if err := s.addSeason(target); err != nil {
+		if err := s.addSeason(ctx, target); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (s *Sync) addSeason(target SeasonTarget) error {
+func (s *Sync) addSeason(ctx context.Context, target SeasonTarget) error {
 	competitionID, ok := s.seasons.CompetitionID(target.CompetitionCode)
 	if !ok {
 		var err error
 
-		competitionID, err = s.initCompetition(target.CompetitionCode)
+		competitionID, err = s.initCompetition(ctx, target.CompetitionCode)
 		if err != nil {
 			return err
 		}
@@ -52,27 +53,27 @@ func (s *Sync) addSeason(target SeasonTarget) error {
 		StartYear:       target.StartYear,
 	}
 
-	if err := s.initEdition(season); err != nil {
+	if err := s.initEdition(ctx, season); err != nil {
 		return err
 	}
 
 	s.seasons = append(s.seasons, season)
 
-	if err := s.initTeams(season); err != nil {
+	if err := s.initTeams(ctx, season); err != nil {
 		return err
 	}
 
-	if err := s.initMatches(season); err != nil {
+	if err := s.initMatches(ctx, season); err != nil {
 		return err
 	}
 
-	if err := s.initGoalScorers(season, defaultGoalScorerLimit); err != nil {
+	if err := s.initGoalScorers(ctx, season, defaultGoalScorerLimit); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Sync) initAreas() error {
+func (s *Sync) initAreas(ctx context.Context) error {
 	apiAreas, err := s.apiClient.FetchAreas()
 	if err != nil {
 		return err
@@ -90,15 +91,15 @@ func (s *Sync) initAreas() error {
 		s.areasByName[area.Name] = area.ID
 	}
 
-	return s.databaseClient.SaveAreas(dbAreas)
+	return s.databaseClient.Save(ctx, dbAreas)
 }
-func (s *Sync) initCompetition(code string) (int, error) {
+func (s *Sync) initCompetition(ctx context.Context, code string) (int, error) {
 	apiCompetition, err := s.apiClient.FetchCompetition(code)
 	if err != nil {
 		return 0, err
 	}
 
-	return apiCompetition.ID, s.databaseClient.SaveCompetitions([]database.Competition{
+	return apiCompetition.ID, s.databaseClient.Save(ctx, []database.Competition{
 		{
 			CompetitionID:   apiCompetition.ID,
 			Name:            apiCompetition.Name,
@@ -109,7 +110,7 @@ func (s *Sync) initCompetition(code string) (int, error) {
 	})
 }
 
-func (s *Sync) initCompetitions(codes map[string]struct{}) error {
+func (s *Sync) initCompetitions(ctx context.Context, codes map[string]struct{}) error {
 	apiCompetitions, err := s.apiClient.FetchCompetitions()
 	if err != nil {
 		return err
@@ -137,10 +138,10 @@ func (s *Sync) initCompetitions(codes map[string]struct{}) error {
 		return fmt.Errorf("competitions not found: %v", maps.Keys(missingCodes))
 	}
 
-	return s.databaseClient.SaveCompetitions(dbCompetitions)
+	return s.databaseClient.Save(ctx, dbCompetitions)
 }
 
-func (s *Sync) initEdition(season Season) error {
+func (s *Sync) initEdition(ctx context.Context, season Season) error {
 
 	edition, err := s.apiClient.FetchEdition(season.CompetitionCode, season.StartYear)
 	if err != nil {
@@ -161,10 +162,10 @@ func (s *Sync) initEdition(season Season) error {
 		Status:        utils.EditionStatus(startTime, endTime),
 	}
 
-	return s.databaseClient.SaveEdition(dbEdition)
+	return s.databaseClient.Save(ctx, dbEdition)
 }
 
-func (s *Sync) initTeams(season Season) error {
+func (s *Sync) initTeams(ctx context.Context, season Season) error {
 	apiTeams, err := s.apiClient.FetchTeams(season.CompetitionCode, season.StartYear)
 	if err != nil {
 		return err
@@ -184,10 +185,10 @@ func (s *Sync) initTeams(season Season) error {
 		})
 	}
 
-	return s.databaseClient.SaveTeams(dbTeams)
+	return s.databaseClient.Save(ctx, dbTeams)
 }
 
-func (s *Sync) initMatches(season Season) error {
+func (s *Sync) initMatches(ctx context.Context, season Season) error {
 	apiMatches, err := s.apiClient.FetchMatches(season.CompetitionCode, season.StartYear)
 	if err != nil {
 		return err
@@ -219,10 +220,10 @@ func (s *Sync) initMatches(season Season) error {
 		})
 	}
 
-	return s.databaseClient.SaveMatches(dbMatches)
+	return s.databaseClient.Save(ctx, dbMatches)
 }
 
-func (s *Sync) initGoalScorers(season Season, limit int) error {
+func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) error {
 	apiGoalScorers, err := s.apiClient.FetchGoalScorers(season.CompetitionCode, season.StartYear, limit)
 	if err != nil {
 		return err
@@ -244,5 +245,5 @@ func (s *Sync) initGoalScorers(season Season, limit int) error {
 		})
 	}
 
-	return s.databaseClient.SaveGoalScorers(dbGoalScorers)
+	return s.databaseClient.Save(ctx, dbGoalScorers)
 }
