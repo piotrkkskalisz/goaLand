@@ -29,9 +29,9 @@ func CreateCompetitionEdition(competition database.Competition, edition database
 	}
 }
 
-func getAcitve(competition database.Competition) (CompetitionEdition, bool) {
+func getAcitveOrUpcoming(competition database.Competition) (CompetitionEdition, bool) {
 	for _, edition := range competition.Editions {
-		if edition.Status == utils.EditionActive {
+		if utils.IsCurrent(edition.Status) {
 			return CreateCompetitionEdition(competition, edition), true
 		}
 	}
@@ -43,7 +43,7 @@ func GetCompetitionEdition(competitions []database.Competition) []CompetitionEdi
 	var response []CompetitionEdition
 
 	for _, competition := range competitions {
-		if competitionEdition, ok := getAcitve(competition); ok {
+		if competitionEdition, ok := getAcitveOrUpcoming(competition); ok {
 			response = append(response, competitionEdition)
 		}
 	}
