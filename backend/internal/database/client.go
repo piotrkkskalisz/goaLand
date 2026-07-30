@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -19,7 +20,7 @@ type Client struct {
 	db *gorm.DB
 }
 
-type Filter map[string]any
+type Filter = map[string]any
 
 func NewClient(config Config) (*Client, error) {
 	dsn := fmt.Sprintf(
@@ -63,15 +64,26 @@ func (c *Client) buildQuery(ctx context.Context, preloads []string) *gorm.DB {
 
 }
 
-func (c *Client) List(ctx context.Context, dest any, preloads ...string) error {
-	return c.buildQuery(ctx, preloads).Find(dest).Error
+func (c *Client) List(ctx context.Context, dest any, filter Filter, preloads ...string) error {
+	return c.buildQuery(ctx, preloads).Where(filter).Find(dest).Error
 }
 
 func (c *Client) Get(ctx context.Context, dest any, filter Filter, preloads ...string) error {
-	return c.buildQuery(ctx, preloads).
-		Where(filter).
-		First(dest).
-		Error
+	return c.buildQuery(ctx, preloads).Where(filter).First(dest).Error
+}
+
+func (c *Client) ListOr(ctx context.Context, dest any, filters []Filter, preloads ...string) error {
+	if len(filters) == 0 {
+		return errors.New("no filters provided")
+	}
+
+	query := c.buildQuery(ctx, preloads).Where(filters[0])
+
+	for _, filter := range filters[1:] {
+		query = query.Or(filter)
+	}
+
+	return query.Find(dest).Error
 }
 
 func (c *Client) DB() *gorm.DB {
