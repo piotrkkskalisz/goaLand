@@ -4,26 +4,36 @@ import "context"
 
 func (c *Client) GetEditionMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
 	var matches []Match
-	err := c.Get(ctx, &matches, Filter{
-		"competition_id": competitionID,
-		"start_year":     startYear,
+	err := c.List(ctx, &matches, Filter{
+		"competition_id":    competitionID,
+		"start_season_year": startYear,
 	},
 	)
 	return matches, err
 }
 
 func (c *Client) GetTeamsMatches(ctx context.Context, teamID int) ([]Match, error) {
+
 	var matches []Match
-	err := c.Get(ctx, &matches, Filter{
-		"team_id": teamID,
-	},
-	)
+
+	err := c.ListOr(ctx, &matches, []Filter{
+		{
+			"home_team_id": teamID,
+		}, {
+			"away_team_id": teamID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	return matches, err
 }
 
 func (c *Client) GetEditionGoalScorers(ctx context.Context, competitionID int, startYear int) ([]GoalScorer, error) {
 	var goalScorers []GoalScorer
-	err := c.Get(ctx, &goalScorers, Filter{
+	err := c.List(ctx, &goalScorers, Filter{
 		"competition_id":    competitionID,
 		"start_season_year": startYear,
 	},
