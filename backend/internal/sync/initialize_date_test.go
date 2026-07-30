@@ -11,6 +11,8 @@ import (
 )
 
 func TestInitializeData(t *testing.T) {
+	ctx := t.Context()
+
 	dbClient, err := database.NewClientFromEnv()
 	require.NoError(t, err)
 
@@ -20,7 +22,7 @@ func TestInitializeData(t *testing.T) {
 	require.NoError(t, err)
 
 	previosYear := testutils.Year - 1
-	err = s.InitializeData(SeasonTargets{
+	err = s.InitializeData(ctx, SeasonTargets{
 		{
 			CompetitionCode: testutils.PremierLeagueCode,
 			StartYear:       testutils.Year,

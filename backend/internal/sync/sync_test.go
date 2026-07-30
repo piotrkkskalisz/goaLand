@@ -28,6 +28,8 @@ func testSync(t *testing.T) (*gomock.Controller, *mocks.MockAPI, *mocks.MockData
 }
 
 func TestInitAreas(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -39,18 +41,20 @@ func TestInitAreas(t *testing.T) {
 		{ID: testutils.EnglandAreaID, Name: testutils.EnglandName, CountryCode: "EN", ParentArea: strPtr("Europe")},
 	}, nil)
 
-	dbMock.EXPECT().SaveAreas([]database.Area{
+	dbMock.EXPECT().Save(ctx, []database.Area{
 		poland,
 		england,
 	}).Return(nil)
 
-	require.NoError(t, s.initAreas())
+	require.NoError(t, s.initAreas(ctx))
 
 	require.Equal(t, s.areasByName["Poland"], testutils.PolandAreaID)
 	require.Equal(t, s.areasByName[testutils.EnglandName], testutils.EnglandAreaID)
 }
 
 func TestInitCompetition(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -68,15 +72,17 @@ func TestInitCompetition(t *testing.T) {
 
 	competition := testutils.NewCompetition()
 
-	dbMock.EXPECT().SaveCompetitions([]database.Competition{competition}).Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Competition{competition}).Return(nil)
 
-	id, err := s.initCompetition(competition.Code)
+	id, err := s.initCompetition(ctx, competition.Code)
 	require.NoError(t, err)
 
 	require.Equal(t, id, competition.CompetitionID)
 }
 
 func TestInitCompetitionFetchError(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, _, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -86,12 +92,14 @@ func TestInitCompetitionFetchError(t *testing.T) {
 		FetchCompetition(testutils.PremierLeagueCode).
 		Return(api.Competition{}, expectedErr)
 
-	_, err := s.initCompetition(testutils.PremierLeagueCode)
+	_, err := s.initCompetition(ctx, testutils.PremierLeagueCode)
 
 	require.ErrorIs(t, err, expectedErr)
 }
 
 func TestInitCompetitions(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -122,23 +130,23 @@ func TestInitCompetitions(t *testing.T) {
 		},
 	}, nil)
 
-	dbMock.EXPECT().
-		SaveCompetitions([]database.Competition{premierLeague}).
-		Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Competition{premierLeague}).Return(nil)
 
-	err := s.initCompetitions(map[string]struct{}{
+	err := s.initCompetitions(ctx, map[string]struct{}{
 		premierLeague.Code: {},
 	})
 	require.NoError(t, err)
 }
 
 func TestInitCompetitionsMissingCodes(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, _, s := testSync(t)
 	defer ctrl.Finish()
 
 	apiMock.EXPECT().FetchCompetitions().Return([]api.Competition{}, nil)
 
-	err := s.initCompetitions(map[string]struct{}{
+	err := s.initCompetitions(ctx, map[string]struct{}{
 		testutils.PremierLeagueCode: {},
 	})
 
@@ -147,6 +155,8 @@ func TestInitCompetitionsMissingCodes(t *testing.T) {
 }
 
 func TestInitMatches(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -165,9 +175,9 @@ func TestInitMatches(t *testing.T) {
 
 	apiMock.EXPECT().FetchMatches(testutils.PremierLeagueCode, testutils.Year).Return([]api.Match{apiMatch}, nil)
 
-	dbMock.EXPECT().SaveMatches([]database.Match{match}).Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Match{match}).Return(nil)
 
-	err := s.initMatches(Season{
+	err := s.initMatches(ctx, Season{
 		CompetitionID:   testutils.PremierLeagueID,
 		CompetitionCode: testutils.PremierLeagueCode,
 		StartYear:       testutils.Year,
@@ -177,6 +187,8 @@ func TestInitMatches(t *testing.T) {
 }
 
 func TestInitGoalScorers(t *testing.T) {
+	ctx := t.Context()
+
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
@@ -204,11 +216,10 @@ func TestInitGoalScorers(t *testing.T) {
 		FetchGoalScorers(testutils.PremierLeagueCode, testutils.Year, defaultGoalScorerLimit).
 		Return([]api.GoalScorer{apiScorer}, nil)
 
-	dbMock.EXPECT().
-		SaveGoalScorers([]database.GoalScorer{expected}).
+	dbMock.EXPECT().Save(ctx, []database.GoalScorer{expected}).
 		Return(nil)
 
-	err := s.initGoalScorers(Season{
+	err := s.initGoalScorers(ctx, Season{
 		CompetitionID:   testutils.PremierLeagueID,
 		CompetitionCode: testutils.PremierLeagueCode,
 		StartYear:       testutils.Year,

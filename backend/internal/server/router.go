@@ -21,5 +21,11 @@ func NewRouter(c *database.Client) http.Handler {
 	//example simply endpoint
 	r.Get("/health", handler.GetHealth)
 
+	// Endpoints
+	r.Get("/teams/{teamID}/matches", handler.GetTeamsMatches)
+	r.Get("/competitions", handler.GetCompetitionEdition)
+	r.Get("/competitions/{competitionID}/{startYear}/matches", handler.GetEditionMatches)
+	r.Get("/competitions/{competitionID}/{startYear}/goal-scorers", handler.GetEditionGoalScorers)
+
 	return r
 }

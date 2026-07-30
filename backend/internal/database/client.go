@@ -1,6 +1,8 @@
 package database
 
 import (
+	"context"
+	"errors"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -8,9 +10,17 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	PreloadArea     = "Area"
+	PreloadEditions = "Editions"
+	PreloadMatches  = "Matches"
+)
+
 type Client struct {
 	db *gorm.DB
 }
+
+type Filter = map[string]any
 
 func NewClient(config Config) (*Client, error) {
 	dsn := fmt.Sprintf(
@@ -36,43 +46,82 @@ func NewClientFromEnv() (*Client, error) {
 
 	return NewClient(config)
 }
-
-func (c *Client) SaveAreas(areas []Area) error {
+func (c *Client) Save(ctx context.Context, data any) error {
 	return c.db.
+		WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&areas).Error
+		Create(data).
+		Error
 }
 
-func (c *Client) SaveCompetitions(competitions []Competition) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&competitions).Error
+func (c *Client) buildQuery(ctx context.Context, preloads []string) *gorm.DB {
+	query := c.db.WithContext(ctx)
+
+	for _, preload := range preloads {
+		query = query.Preload(preload)
+	}
+	return query
+
 }
 
-func (c *Client) SaveEdition(edition Edition) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&edition).Error
+func (c *Client) List(ctx context.Context, dest any, filter Filter, preloads ...string) error {
+	return c.buildQuery(ctx, preloads).Where(filter).Find(dest).Error
 }
 
-func (c *Client) SaveTeams(teams []Team) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&teams).Error
+func (c *Client) Get(ctx context.Context, dest any, filter Filter, preloads ...string) error {
+	return c.buildQuery(ctx, preloads).Where(filter).First(dest).Error
 }
 
-func (c *Client) SaveMatches(matches []Match) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&matches).Error
-}
+func (c *Client) ListOr(ctx context.Context, dest any, filters []Filter, preloads ...string) error {
+	if len(filters) == 0 {
+		return errors.New("no filters provided")
+	}
 
-func (c *Client) SaveGoalScorers(goalScorers []GoalScorer) error {
-	return c.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&goalScorers).Error
+	query := c.buildQuery(ctx, preloads).Where(filters[0])
+
+	for _, filter := range filters[1:] {
+		query = query.Or(filter)
+	}
+
+	return query.Find(dest).Error
 }
 
 func (c *Client) DB() *gorm.DB {
 	return c.db
+}
+
+func (c *Client) GetArea(ctx context.Context, id int, preloads ...string) (*Area, error) {
+	var area Area
+	err := c.Get(ctx, &area, Filter{"area_id": id}, preloads...)
+	return &area, err
+}
+
+func (c *Client) GetCompetition(ctx context.Context, id int, preloads ...string) (*Competition, error) {
+	var competition Competition
+	err := c.Get(ctx, &competition, Filter{"competition_id": id}, preloads...)
+	return &competition, err
+}
+
+func (c *Client) GetTeam(ctx context.Context, id int, preloads ...string) (*Team, error) {
+	var team Team
+	err := c.Get(ctx, &team, Filter{"team_id": id}, preloads...)
+	return &team, err
+}
+
+func (c *Client) GetMatch(ctx context.Context, id int, preloads ...string) (*Match, error) {
+	var match Match
+	err := c.Get(ctx, &match, Filter{"match_id": id}, preloads...)
+	return &match, err
+}
+
+func (c *Client) GetGoalScorer(ctx context.Context, id int, preloads ...string) (*GoalScorer, error) {
+	var scorer GoalScorer
+	err := c.Get(ctx, &scorer, Filter{"goal_scorer_id": id}, preloads...)
+	return &scorer, err
+}
+
+func (c *Client) GetEdition(ctx context.Context, competitionID, startYear int, preloads ...string) (*Edition, error) {
+	var edition Edition
+	err := c.Get(ctx, &edition, Filter{"competition_id": competitionID, "start_year": startYear}, preloads...)
+	return &edition, err
 }

@@ -11,7 +11,7 @@ package mocks
 
 import (
 	api "backend/internal/api"
-	database "backend/internal/database"
+	context "context"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -170,86 +170,16 @@ func (m *MockDatabase) EXPECT() *MockDatabaseMockRecorder {
 	return m.recorder
 }
 
-// SaveAreas mocks base method.
-func (m *MockDatabase) SaveAreas(arg0 []database.Area) error {
+// Save mocks base method.
+func (m *MockDatabase) Save(arg0 context.Context, arg1 any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveAreas", arg0)
+	ret := m.ctrl.Call(m, "Save", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SaveAreas indicates an expected call of SaveAreas.
-func (mr *MockDatabaseMockRecorder) SaveAreas(arg0 any) *gomock.Call {
+// Save indicates an expected call of Save.
+func (mr *MockDatabaseMockRecorder) Save(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAreas", reflect.TypeOf((*MockDatabase)(nil).SaveAreas), arg0)
-}
-
-// SaveCompetitions mocks base method.
-func (m *MockDatabase) SaveCompetitions(arg0 []database.Competition) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveCompetitions", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveCompetitions indicates an expected call of SaveCompetitions.
-func (mr *MockDatabaseMockRecorder) SaveCompetitions(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveCompetitions", reflect.TypeOf((*MockDatabase)(nil).SaveCompetitions), arg0)
-}
-
-// SaveEdition mocks base method.
-func (m *MockDatabase) SaveEdition(arg0 database.Edition) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveEdition", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveEdition indicates an expected call of SaveEdition.
-func (mr *MockDatabaseMockRecorder) SaveEdition(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveEdition", reflect.TypeOf((*MockDatabase)(nil).SaveEdition), arg0)
-}
-
-// SaveGoalScorers mocks base method.
-func (m *MockDatabase) SaveGoalScorers(arg0 []database.GoalScorer) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveGoalScorers", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveGoalScorers indicates an expected call of SaveGoalScorers.
-func (mr *MockDatabaseMockRecorder) SaveGoalScorers(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveGoalScorers", reflect.TypeOf((*MockDatabase)(nil).SaveGoalScorers), arg0)
-}
-
-// SaveMatches mocks base method.
-func (m *MockDatabase) SaveMatches(arg0 []database.Match) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveMatches", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveMatches indicates an expected call of SaveMatches.
-func (mr *MockDatabaseMockRecorder) SaveMatches(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveMatches", reflect.TypeOf((*MockDatabase)(nil).SaveMatches), arg0)
-}
-
-// SaveTeams mocks base method.
-func (m *MockDatabase) SaveTeams(arg0 []database.Team) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveTeams", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveTeams indicates an expected call of SaveTeams.
-func (mr *MockDatabaseMockRecorder) SaveTeams(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveTeams", reflect.TypeOf((*MockDatabase)(nil).SaveTeams), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockDatabase)(nil).Save), arg0, arg1)
 }

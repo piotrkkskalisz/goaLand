@@ -19,6 +19,6 @@ func EditionStatus(startDate time.Time, endDate time.Time) string {
 	}
 }
 
-func matchStatus(startDate time.Time, endDate time.Time) string {
-	return ""
+func IsCurrent(status string) bool {
+	return status == EditionActive || status == EditionUpcoming
 }
