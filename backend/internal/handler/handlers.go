@@ -42,6 +42,20 @@ func (h *Handler) GetTeamsMatches(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, response)
 }
 
+func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var competitions []database.Competition
+	if err := h.db.List(ctx, &competitions, nil, database.PreloadEditions); err != nil {
+		http.Error(w, "failed to load leagues", http.StatusInternalServerError)
+		return
+	}
+
+	response := transform.GetCompetitionEdition(competitions)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+
 func (h *Handler) GetEditionGoalScorers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -56,20 +70,6 @@ func (h *Handler) GetEditionGoalScorers(w http.ResponseWriter, r *http.Request) 
 		WriteError(w, http.StatusInternalServerError, "failed to load goal scorers")
 		return
 	}
-
-	WriteJSON(w, http.StatusOK, response)
-}
-
-func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var competitions []database.Competition
-	if err := h.db.List(ctx, &competitions, database.PreloadEditions); err != nil {
-		http.Error(w, "failed to load leagues", http.StatusInternalServerError)
-		return
-	}
-
-	response := transform.GetCompetitionEdition(competitions)
 
 	WriteJSON(w, http.StatusOK, response)
 }
