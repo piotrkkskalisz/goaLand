@@ -1,1 +1,100 @@
 @import "tailwindcss";
+
+@theme {
+  --color-light: #F8FAF6;
+  --color-dark: #0D0D0C;
+
+  --color-green-900: #1B2615;
+  --color-green-800: #2C3F2B;
+  --color-green-750: #274425;
+  --color-green-700: #215705;
+  --color-green-600: #145910;
+  --color-green-500: #74A659;
+
+  --color-granit-850: #262824;
+  --color-granit-800: #2D332B;
+  --color-granit-600: #343732;
+
+  --color-red-600: #FF1D1D;
+  --color-red-800: #570F0F;
+
+  --color-background: var(--color-granit-600);
+  --color-sections: var(--color-granit-800);
+  --color-card: var(--color-granit-850);
+  --color-card-hover: var(--color-green-800);
+
+  --color-header: var(--color-green-900);
+  --color-primary: var(--color-green-750);
+  --color-search: var(--color-green-500);
+  --color-contrast: var(--color-green-600);
+
+  --color-live: var(--color-red-600);
+  --color-live-dark: var(--color-red-800);
+
+  --color-text: var(--color-light);
+  --color-text-heading: var(--color-light);
+  --color-text-primary: var(--color-light);
+  --color-text-secondary: var(--color-light);
+  --color-text-inverse: var(--color-light);
+  --color-text-dark: var(--color-dark);
+  --color-text-muted: #9ca3af;
+
+  --color-border: var(--color-granit-800);
+
+  /*fonts*/
+  --font-size-heading: 48px;
+  --font-size-heading2: 36px;
+  --font-size-primary: 24px;
+  --font-size-secondary: 15px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text antialiased;
+
+    margin: 0;
+    min-height: 100vh;
+    font-size: var(--font-size-secondary);
+    font-weight: var(--font-weight-regular);
+  }
+}
+
+@layer utilities {
+  .text-heading-bold {
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .text-heading {
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .text-primary {
+    font-size: var(--font-size-primary);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .text-primary-medium {
+    font-size: var(--font-size-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .text-primary-bold {
+    font-size: var(--font-size-primary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .text-secondary {
+    font-size: var(--font-size-secondary);
+    font-weight: var(--font-weight-regular);
+  }
+}
