@@ -24,12 +24,12 @@
   --color-card-hover: var(--color-green-800);
 
   --color-header: var(--color-green-900);
-  --color-primary: var(--color-green-750);
-  --color-search: var(--color-green-500);
+  --color-search: var(--color-green-800);
   --color-contrast: var(--color-green-600);
 
   --color-live: var(--color-red-600);
   --color-live-dark: var(--color-red-800);
+  --color-live-text: #BDDD06;
 
   --color-text: var(--color-light);
   --color-text-heading: var(--color-light);
