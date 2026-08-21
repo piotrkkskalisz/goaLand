@@ -215,6 +215,9 @@ func (s *Sync) initMatches(ctx context.Context, season Season) error {
 			Status:            match.Status,
 			StartTime:         startTime,
 
+			Matchday: match.Matchday,
+			Stage:    match.Stage,
+
 			// TODO
 			// StadiumID
 		})

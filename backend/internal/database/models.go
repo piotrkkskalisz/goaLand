@@ -4,9 +4,9 @@ import "time"
 
 type Area struct {
 	AreaID    int `gorm:"primaryKey"`
-	Name      string
-	Code      string
-	IsCountry bool
+	Name      string `gorm:"not null;unique"`
+	Code      string `gorm:"not null;unique"`
+	IsCountry bool   `gorm:"not null"`
 
 	Competitions []Competition
 	Teams        []Team
@@ -16,11 +16,11 @@ type Area struct {
 type Competition struct {
 	CompetitionID int `gorm:"primaryKey"`
 
-	Name            string
-	Code            string
-	CompetitionType string
+	Name            string `gorm:"not null;unique"`
+	Code            string `gorm:"not null;unique"`
+	CompetitionType string `gorm:"not null"`
 
-	AreaID int
+	AreaID int `gorm:"not null"`
 	Area   Area
 
 	Editions []Edition
@@ -29,13 +29,13 @@ type Competition struct {
 type Team struct {
 	TeamID int `gorm:"primaryKey"`
 
-	FullName  string
-	ShortName string
-	Code      string
+	FullName  string `gorm:"not null;unique"`
+	ShortName string `gorm:"not null"`
+	Code      string `gorm:"not null;unique"`
 	Colors    string
 
-	Stadium string
-	AreaID  int
+	Stadium string `gorm:"not null"`
+	AreaID  int    `gorm:"not null"`
 	Area    Area
 
 	HomeMatches []Match `gorm:"foreignKey:HomeTeamID"`
@@ -49,7 +49,7 @@ type Edition struct {
 	Competition   Competition
 
 	StartYear int `gorm:"primaryKey"`
-	Status    string
+	Status    string `gorm:"not null"`
 
 	Matches     []Match      `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 	GoalScorers []GoalScorer `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
@@ -58,14 +58,14 @@ type Edition struct {
 type Match struct {
 	MatchID int `gorm:"primaryKey"`
 
-	HomeTeamID int
+	HomeTeamID int  `gorm:"not null"`
 	HomeTeam   Team `gorm:"foreignKey:HomeTeamID"`
 
-	AwayTeamID int
+	AwayTeamID int  `gorm:"not null"`
 	AwayTeam   Team `gorm:"foreignKey:AwayTeamID"`
 
-	CompetitionID   int
-	StartSeasonYear int
+	CompetitionID   int `gorm:"not null"`
+	StartSeasonYear int `gorm:"not null"`
 
 	Edition Edition `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 
@@ -75,14 +75,17 @@ type Match struct {
 	HalfTimeHomeGoals *int
 	HalfTimeAwayGoals *int
 
-	Status    string
-	StartTime time.Time
+	Status    string    `gorm:"not null"`
+	StartTime time.Time `gorm:"not null"`
+
+	Matchday *int
+	Stage    string `gorm:"not null"`
 }
 
 type GoalScorer struct {
 	GoalScorerID int `gorm:"primaryKey"`
 
-	TeamID int
+	TeamID int `gorm:"not null"`
 	Team   Team
 
 	CompetitionID   int `gorm:"primaryKey"`
@@ -90,12 +93,12 @@ type GoalScorer struct {
 
 	Edition Edition `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 
-	Name string
+	Name string `gorm:"not null"`
 
-	NationalityAreaID int
+	NationalityAreaID int `gorm:"not null"`
 	NationalityArea   Area `gorm:"foreignKey:NationalityAreaID"`
 
-	Goals            int
-	Assists          int
-	GoalsFromPenalty int
+	Goals            int `gorm:"not null"`
+	Assists          int `gorm:"not null"`
+	GoalsFromPenalty int `gorm:"not null"`
 }

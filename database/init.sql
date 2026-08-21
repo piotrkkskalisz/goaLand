@@ -17,14 +17,11 @@ CREATE TABLE competitions (
 );
 
 CREATE TABLE editions (
-    edition_id INTEGER PRIMARY KEY,
-    
     competition_id INTEGER NOT NULL REFERENCES competitions(competition_id),
-    
     start_year INTEGER NOT NULL,
     status VARCHAR(255) NOT NULL,
 
-    UNIQUE (competition_id, start_year)
+    PRIMARY KEY (competition_id, start_year)
 );
 
 CREATE TABLE teams (
@@ -36,8 +33,17 @@ CREATE TABLE teams (
     colors VARCHAR(255),
 
     stadium VARCHAR(255) NOT NULL,
-,
     area_id INTEGER NOT NULL REFERENCES areas(area_id)
+);
+
+CREATE TABLE edition_teams (
+    team_id INTEGER NOT NULL REFERENCES teams(team_id),
+    competition_id INTEGER NOT NULL,
+    start_year INTEGER NOT NULL,
+
+    PRIMARY KEY (team_id, competition_id, start_year),
+    FOREIGN KEY (competition_id, start_year)
+        REFERENCES editions(competition_id, start_year)
 );
 
 CREATE TABLE matches (
@@ -45,7 +51,8 @@ CREATE TABLE matches (
 
     home_team_id INTEGER NOT NULL REFERENCES teams(team_id),
     away_team_id INTEGER NOT NULL REFERENCES teams(team_id),
-    edition_id INTEGER NOT NULL REFERENCES editions(edition_id),
+    competition_id INTEGER NOT NULL,
+    start_season_year INTEGER NOT NULL,
 
     home_goals INTEGER,
     away_goals INTEGER,
@@ -54,32 +61,49 @@ CREATE TABLE matches (
 
     status VARCHAR(255) NOT NULL,
     start_time TIMESTAMP NOT NULL,
+    stage VARCHAR(255) NOT NULL,
+    matchday INTEGER,
 
+    FOREIGN KEY (competition_id, start_season_year)
+        REFERENCES editions(competition_id, start_year),
     CHECK (home_team_id <> away_team_id),
-    CHECK (home_goals IS NULL AND  away_goals IS NULL OR 
-        home_goals >= 0 AND away_goals >= 0),
-    CHECK (half_time_home_goals IS NULL AND  half_time_away_goals IS NULL OR 
-        half_time_home_goals >= 0 AND half_time_away_goals >= 0),
-    CHECK (half_time_home_goals <= home_goals AND half_time_away_goals <= away_goals)
-
+    CHECK (
+        (home_goals IS NULL AND away_goals IS NULL)
+        OR (home_goals >= 0 AND away_goals >= 0)
+    ),
+    CHECK (
+        (half_time_home_goals IS NULL AND half_time_away_goals IS NULL)
+        OR (half_time_home_goals >= 0 AND half_time_away_goals >= 0)
+    ),
+    CHECK (
+        half_time_home_goals IS NULL
+        OR half_time_away_goals IS NULL
+        OR home_goals IS NULL
+        OR away_goals IS NULL
+        OR (
+            half_time_home_goals <= home_goals
+            AND half_time_away_goals <= away_goals
+        )
+    ),
+    CHECK (matchday IS NULL OR matchday > 0)
 );
 
 CREATE TABLE goal_scorers (
-    goal_scorer_id INTEGER PRIMARY KEY,
-
+    goal_scorer_id INTEGER NOT NULL,
     team_id INTEGER NOT NULL REFERENCES teams(team_id),
-    edition_id INTEGER NOT NULL REFERENCES editions(edition_id),
+    competition_id INTEGER NOT NULL,
+    start_season_year INTEGER NOT NULL,
 
-    name VARCHAR(255)  NOT NULL,
-
+    name VARCHAR(255) NOT NULL,
     nationality_area_id INTEGER NOT NULL REFERENCES areas(area_id),
-
-    position VARCHAR(255) NOT NULL,
 
     goals INTEGER NOT NULL,
     assists INTEGER NOT NULL,
     goals_from_penalty INTEGER NOT NULL,
 
+    PRIMARY KEY (goal_scorer_id, competition_id, start_season_year),
+    FOREIGN KEY (competition_id, start_season_year)
+        REFERENCES editions(competition_id, start_year),
     CHECK (goals >= 0),
     CHECK (assists >= 0),
     CHECK (

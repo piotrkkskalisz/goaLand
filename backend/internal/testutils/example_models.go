@@ -111,6 +111,7 @@ func NewEdition() database.Edition {
 // NewMatch creates Arsenal vs Manchester City match.
 func NewMatch() database.Match {
 	homeGoals, awayGoals := 2, 1
+	matchday := 1
 
 	return database.Match{
 		MatchID:         100,
@@ -122,6 +123,8 @@ func NewMatch() database.Match {
 		AwayGoals:       &awayGoals,
 		Status:          "FINISHED",
 		StartTime:       time.Date(Year, 8, 10, 15, 0, 0, 0, time.UTC),
+		Matchday:        &matchday,
+		Stage:           "REGULAR_SEASON",
 	}
 }
 

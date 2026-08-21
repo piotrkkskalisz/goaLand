@@ -11,7 +11,8 @@ type Match struct {
 
 	UtcDate  string `json:"utcDate"`
 	Status   string `json:"status"`
-	Matchday int    `json:"matchday"`
+	Matchday *int   `json:"matchday"`
+	Stage    string `json:"stage"`
 
 	HomeTeam struct {
 		ID int `json:"id"`
