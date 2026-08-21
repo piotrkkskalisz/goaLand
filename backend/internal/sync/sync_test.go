@@ -163,9 +163,11 @@ func TestInitMatches(t *testing.T) {
 	match := testutils.NewMatch()
 
 	apiMatch := api.Match{
-		ID:      match.MatchID,
-		UtcDate: match.StartTime.Format(time.RFC3339),
-		Status:  match.Status,
+		ID:       match.MatchID,
+		UtcDate:  match.StartTime.Format(time.RFC3339),
+		Status:   match.Status,
+		Matchday: match.Matchday,
+		Stage:    match.Stage,
 	}
 	apiMatch.HomeTeam.ID = match.HomeTeamID
 	apiMatch.AwayTeam.ID = match.AwayTeamID

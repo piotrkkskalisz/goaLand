@@ -49,5 +49,7 @@ func TestDatabaseIntegrity(t *testing.T) {
 
 	require.Equal(t, competition.Name, loadedEdition.Competition.Name)
 	require.Len(t, loadedEdition.Matches, 1)
+	require.Equal(t, match.Matchday, loadedEdition.Matches[0].Matchday)
+	require.Equal(t, match.Stage, loadedEdition.Matches[0].Stage)
 	require.Len(t, loadedEdition.GoalScorers, 1)
 }

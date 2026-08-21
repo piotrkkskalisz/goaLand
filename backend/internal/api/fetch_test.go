@@ -119,6 +119,11 @@ func TestFetchMatches(t *testing.T) {
 
 		require.NotEmpty(t, match.UtcDate)
 		require.NotEmpty(t, match.Status)
+		require.NotEmpty(t, match.Stage)
+
+		if match.Matchday != nil {
+			require.Greater(t, *match.Matchday, 0)
+		}
 
 		require.NotZero(t, match.HomeTeam.ID)
 		require.NotZero(t, match.AwayTeam.ID)
