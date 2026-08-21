@@ -9,7 +9,6 @@ type LiveMatchProps = MatchBaseProps & {
   status: "live";
   homeScore: number;
   awayScore: number;
-  minute: number;
 };
 
 type FinishedMatchProps = MatchBaseProps & {
@@ -56,8 +55,7 @@ export function Match(props: MatchProps) {
       </div>
 
       <div className={`text-center text-primary ${isLive ? "text-live" : ""}`}>
-        <div>{score}</div>
-        {isLive && <div className="text-secondary">{props.minute}'</div>}
+        {score}
       </div>
 
       <div className="flex items-center justify-end gap-[10px] px-[10px]">

@@ -26,7 +26,6 @@ export function MainPage() {
                 awayTeam: "Chelsea",
                 homeScore: 0,
                 awayScore: 0,
-                minute: 82,
               },
               {
                 status: "finished",
