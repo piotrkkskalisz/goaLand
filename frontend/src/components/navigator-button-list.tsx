@@ -2,15 +2,7 @@ import { NavigatorButton } from "./navigator-button";
 
 const buttonNames = ["wyniki", "mecze", "tabela", "strzelcy", "asystenci"] as const;
 
-type NavigatorButtonName = (typeof buttonNames)[number];
-
-type NavigatorButtonListProps = {
-  selectedButton: NavigatorButtonName;
-};
-
-export function NavigatorButtonList({
-  selectedButton,
-}: NavigatorButtonListProps) {
+export function NavigatorButtonList() {
   return (
     <nav
       aria-label="Nawigacja rozgrywek"
@@ -18,9 +10,9 @@ export function NavigatorButtonList({
     >
       {buttonNames.map((buttonName) => (
         <NavigatorButton
-          isSelected={buttonName === selectedButton}
           key={buttonName}
           text={buttonName}
+          to={buttonName}
         />
       ))}
     </nav>

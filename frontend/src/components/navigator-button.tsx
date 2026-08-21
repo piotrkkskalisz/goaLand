@@ -1,21 +1,21 @@
+import { NavLink } from "react-router";
+
 type NavigatorButtonProps = {
-  isSelected: boolean;
   text: string;
+  to: string;
 };
 
-export function NavigatorButton({
-  isSelected,
-  text,
-}: NavigatorButtonProps) {
+export function NavigatorButton({ text, to }: NavigatorButtonProps) {
   return (
-    <button
-      aria-pressed={isSelected}
-      className={`h-[60px] w-[180px] rounded-sm px-[10px] py-[15px] text-primary ${
-        isSelected ? "bg-green-700" : "bg-green-750"
-      }`}
-      type="button"
+    <NavLink
+      className={({ isActive }) =>
+        `flex h-[60px] w-[180px] items-center justify-center rounded-sm px-[10px] py-[15px] text-primary ${
+          isActive ? "bg-green-700" : "bg-green-750 hover:bg-green-725"
+        }`
+      }
+      to={to}
     >
       {text}
-    </button>
+    </NavLink>
   );
 }
