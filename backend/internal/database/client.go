@@ -16,6 +16,8 @@ const (
 	PreloadMatches  = "Matches"
 )
 
+var preloadTeams = []string{"HomeTeam", "AwayTeam"}
+
 type Client struct {
 	db *gorm.DB
 }
