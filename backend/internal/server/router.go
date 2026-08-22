@@ -26,6 +26,6 @@ func NewRouter(c *database.Client) http.Handler {
 	r.Get("/competitions", handler.GetCompetitionEdition)
 	r.Get("/competitions/{competitionID}/{startYear}/matches", handler.GetEditionMatches)
 	r.Get("/competitions/{competitionID}/{startYear}/goal-scorers", handler.GetEditionGoalScorers)
-
+	r.Get("/competitions/{competitionID}/{startYear}/results", handler.GetEditionResults)
 	return r
 }

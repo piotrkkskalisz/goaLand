@@ -16,7 +16,7 @@ type CompetitionEdition struct {
 	Status    string `json:"status"`
 }
 
-func CreateCompetitionEdition(competition database.Competition, edition database.Edition) CompetitionEdition {
+func createCompetitionEdition(competition database.Competition, edition database.Edition) CompetitionEdition {
 	return CompetitionEdition{
 		CompetitionID: competition.CompetitionID,
 
@@ -32,7 +32,7 @@ func CreateCompetitionEdition(competition database.Competition, edition database
 func getAcitveOrUpcoming(competition database.Competition) (CompetitionEdition, bool) {
 	for _, edition := range competition.Editions {
 		if utils.IsCurrent(edition.Status) {
-			return CreateCompetitionEdition(competition, edition), true
+			return createCompetitionEdition(competition, edition), true
 		}
 	}
 

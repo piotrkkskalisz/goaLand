@@ -1,15 +1,53 @@
 package database
 
-import "context"
+import (
+	"backend/internal/utils"
+	"cmp"
+	"context"
+	"slices"
+)
 
 func (c *Client) GetEditionMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+	statuses := slices.Concat(
+		utils.UpcomingMatchStatuses,
+		utils.LiveMatchStatuses,
+	)
+
+	return c.getEditionMatches(ctx, competitionID, startYear, statuses)
+}
+
+func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+	matches, err := c.getEditionMatches(ctx, competitionID, startYear, utils.FinishedMatchStatuses)
+	if err != nil {
+		return nil, err
+	}
+
+	slices.Reverse(matches)
+
+	return matches, nil
+}
+
+func (c *Client) getEditionMatches(ctx context.Context, competitionID int, startYear int,
+	statuses []string) ([]Match, error) {
+
 	var matches []Match
-	err := c.List(ctx, &matches, Filter{
+	if err := c.List(ctx, &matches, Filter{
 		"competition_id":    competitionID,
 		"start_season_year": startYear,
-	},
-	)
-	return matches, err
+		"status":            statuses,
+	}, preloadTeams...); err != nil {
+		return nil, err
+	}
+
+	slices.SortFunc(matches, func(a, b Match) int {
+		if result := a.StartTime.Compare(b.StartTime); result != 0 {
+			return result
+		}
+
+		return cmp.Compare(a.MatchID, b.MatchID)
+	})
+
+	return matches, nil
 }
 
 func (c *Client) GetTeamsMatches(ctx context.Context, teamID int) ([]Match, error) {

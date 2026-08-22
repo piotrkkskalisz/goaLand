@@ -3,10 +3,20 @@ package handler
 import (
 	"backend/internal/database"
 	"backend/internal/transform"
+	"context"
 	"net/http"
 )
 
+func (h *Handler) GetEditionResults(w http.ResponseWriter, r *http.Request) {
+	h.GetEditionSelectMatches(w, r, h.db.GetEditionResult)
+}
+
 func (h *Handler) GetEditionMatches(w http.ResponseWriter, r *http.Request) {
+	h.GetEditionSelectMatches(w, r, h.db.GetEditionMatches)
+}
+func (h *Handler) GetEditionSelectMatches(w http.ResponseWriter, r *http.Request,
+	getEditionMatches func(context.Context, int, int) ([]database.Match, error)) {
+
 	ctx := r.Context()
 
 	competitionID, startYear, err := editionParams(r)
@@ -15,13 +25,15 @@ func (h *Handler) GetEditionMatches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := h.db.GetEditionMatches(ctx, competitionID, startYear)
+	matches, err := getEditionMatches(ctx, competitionID, startYear)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to load matches")
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, response)
+	groupMatchesResponse := transform.GroupByRounds(matches)
+
+	WriteJSON(w, http.StatusOK, groupMatchesResponse)
 }
 
 func (h *Handler) GetTeamsMatches(w http.ResponseWriter, r *http.Request) {
