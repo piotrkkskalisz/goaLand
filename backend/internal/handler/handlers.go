@@ -8,32 +8,53 @@ import (
 )
 
 func (h *Handler) GetEditionResults(w http.ResponseWriter, r *http.Request) {
-	h.GetEditionSelectMatches(w, r, h.db.GetEditionResult)
+	matches, ok := h.loadEditionMatches(w, r, h.db.GetEditionResult)
+
+	if ok {
+		groupMatchesResponse := transform.GroupByRounds(matches)
+		WriteJSON(w, http.StatusOK, groupMatchesResponse)
+	}
 }
 
 func (h *Handler) GetEditionMatches(w http.ResponseWriter, r *http.Request) {
-	h.GetEditionSelectMatches(w, r, h.db.GetEditionMatches)
+	matches, ok := h.loadEditionMatches(w, r, h.db.GetEditionMatches)
+
+	if ok {
+		groupMatchesResponse := transform.GroupByRounds(matches)
+		WriteJSON(w, http.StatusOK, groupMatchesResponse)
+	}
 }
-func (h *Handler) GetEditionSelectMatches(w http.ResponseWriter, r *http.Request,
-	getEditionMatches func(context.Context, int, int) ([]database.Match, error)) {
+
+func (h *Handler) GetFeaturedMatches(w http.ResponseWriter, r *http.Request) {
+	matches, ok := h.loadEditionMatches(w, r,
+		h.db.FeaturedMatchesQuery(transform.From(), transform.To()),
+	)
+
+	if ok {
+		featuredMatchesResponse := transform.GetFeaturedMatches(matches)
+		WriteJSON(w, http.StatusOK, featuredMatchesResponse)
+	}
+}
+
+func (h *Handler) loadEditionMatches(w http.ResponseWriter, r *http.Request,
+	getEditionMatches func(context.Context, int, int) ([]database.Match, error)) (
+	[]database.Match, bool) {
 
 	ctx := r.Context()
 
 	competitionID, startYear, err := editionParams(r)
 	if err != nil {
 		WriteError(w, http.StatusBadRequest, err.Error())
-		return
+		return nil, false
 	}
 
 	matches, err := getEditionMatches(ctx, competitionID, startYear)
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to load matches")
-		return
+		return nil, false
 	}
 
-	groupMatchesResponse := transform.GroupByRounds(matches)
-
-	WriteJSON(w, http.StatusOK, groupMatchesResponse)
+	return matches, true
 }
 
 func (h *Handler) GetTeamsMatches(w http.ResponseWriter, r *http.Request) {
