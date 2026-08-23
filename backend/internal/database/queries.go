@@ -5,13 +5,11 @@ import (
 	"cmp"
 	"context"
 	"slices"
+	"time"
 )
 
 func (c *Client) GetEditionMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
-	statuses := slices.Concat(
-		utils.UpcomingMatchStatuses,
-		utils.LiveMatchStatuses,
-	)
+	statuses := slices.Concat(utils.UpcomingMatchStatuses, utils.LiveMatchStatuses)
 
 	return c.getEditionMatches(ctx, competitionID, startYear, statuses)
 }
@@ -21,7 +19,6 @@ func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startY
 	if err != nil {
 		return nil, err
 	}
-
 	slices.Reverse(matches)
 
 	return matches, nil
@@ -29,7 +26,6 @@ func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startY
 
 func (c *Client) getEditionMatches(ctx context.Context, competitionID int, startYear int,
 	statuses []string) ([]Match, error) {
-
 	var matches []Match
 	if err := c.List(ctx, &matches, Filter{
 		"competition_id":    competitionID,
@@ -39,6 +35,29 @@ func (c *Client) getEditionMatches(ctx context.Context, competitionID int, start
 		return nil, err
 	}
 
+	sortMatches(matches)
+	return matches, nil
+}
+
+func (c *Client) FeaturedMatchesQuery(from time.Time, to time.Time) func(
+	ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+	return func(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+		var matches []Match
+		err := c.buildQuery(ctx, preloadTeams).Where(Filter{
+			"competition_id":    competitionID,
+			"start_season_year": startYear,
+			"status":            utils.DisplayableMatchStatuses,
+		}).Where("start_time >= ? AND start_time < ?", from, to).Find(&matches).Error
+		if err != nil {
+			return nil, err
+		}
+
+		sortMatches(matches)
+		return matches, nil
+	}
+}
+
+func sortMatches(matches []Match) {
 	slices.SortFunc(matches, func(a, b Match) int {
 		if result := a.StartTime.Compare(b.StartTime); result != 0 {
 			return result
@@ -46,12 +65,9 @@ func (c *Client) getEditionMatches(ctx context.Context, competitionID int, start
 
 		return cmp.Compare(a.MatchID, b.MatchID)
 	})
-
-	return matches, nil
 }
 
 func (c *Client) GetTeamsMatches(ctx context.Context, teamID int) ([]Match, error) {
-
 	var matches []Match
 
 	err := c.ListOr(ctx, &matches, []Filter{
