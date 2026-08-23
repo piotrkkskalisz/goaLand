@@ -248,5 +248,9 @@ func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) er
 		})
 	}
 
+	if len(apiGoalScorers) == 0 {
+		return nil
+	}
+
 	return s.databaseClient.Save(ctx, dbGoalScorers)
 }
