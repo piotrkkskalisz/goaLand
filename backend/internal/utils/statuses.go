@@ -1,6 +1,9 @@
 package utils
 
-import "time"
+import (
+	"slices"
+	"time"
+)
 
 const (
 	EditionUpcoming = "UPCOMING"
@@ -25,6 +28,12 @@ var FinishedMatchStatuses = []string{
 	"FINISHED",
 	"AWARDED",
 }
+
+var DisplayableMatchStatuses = slices.Concat(
+	UpcomingMatchStatuses,
+	LiveMatchStatuses,
+	FinishedMatchStatuses,
+)
 
 func EditionStatus(startDate time.Time, endDate time.Time) string {
 	now := time.Now()
