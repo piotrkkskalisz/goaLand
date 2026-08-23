@@ -12,7 +12,7 @@ import (
 
 const (
 	resetDatabaseOnStart = false
-	tryFetchData         = true
+	tryFetchData         = false
 )
 
 func main() {
@@ -69,9 +69,23 @@ func fetchData(db *database.Client) error {
 	api := api.NewClientFromEnv()
 	ctx := context.Background()
 	worker := sync.New(api, db)
-	target := sync.SeasonTarget{
+	targets := []sync.SeasonTarget{{
 		CompetitionCode: "PL",
 		StartYear:       2026,
+	}, {
+		CompetitionCode: "PD",
+		StartYear:       2026,
+	}, {
+		CompetitionCode: "BL1",
+		StartYear:       2026,
+	}, {
+		CompetitionCode: "SA",
+		StartYear:       2026,
+	}, {
+		CompetitionCode: "FL1",
+		StartYear:       2026,
+	},
 	}
-	return worker.InitializeData(ctx, sync.SeasonTargets{target})
+
+	return worker.InitializeData(ctx, targets)
 }
