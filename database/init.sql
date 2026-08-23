@@ -29,7 +29,7 @@ CREATE TABLE teams (
 
     full_name VARCHAR(255) NOT NULL UNIQUE,
     short_name VARCHAR(255) NOT NULL,
-    code VARCHAR(255) NOT NULL UNIQUE,
+    code VARCHAR(255) NOT NULL,
     colors VARCHAR(255),
 
     stadium VARCHAR(255) NOT NULL,
