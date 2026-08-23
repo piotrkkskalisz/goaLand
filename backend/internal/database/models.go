@@ -3,7 +3,7 @@ package database
 import "time"
 
 type Area struct {
-	AreaID    int `gorm:"primaryKey"`
+	AreaID    int    `gorm:"primaryKey"`
 	Name      string `gorm:"not null;unique"`
 	Code      string `gorm:"not null;unique"`
 	IsCountry bool   `gorm:"not null"`
@@ -31,7 +31,7 @@ type Team struct {
 
 	FullName  string `gorm:"not null;unique"`
 	ShortName string `gorm:"not null"`
-	Code      string `gorm:"not null;unique"`
+	Code      string `gorm:"not null"`
 	Colors    string
 
 	Stadium string `gorm:"not null"`
@@ -48,7 +48,7 @@ type Edition struct {
 	CompetitionID int `gorm:"primaryKey"`
 	Competition   Competition
 
-	StartYear int `gorm:"primaryKey"`
+	StartYear int    `gorm:"primaryKey"`
 	Status    string `gorm:"not null"`
 
 	Matches     []Match      `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
@@ -95,7 +95,7 @@ type GoalScorer struct {
 
 	Name string `gorm:"not null"`
 
-	NationalityAreaID int `gorm:"not null"`
+	NationalityAreaID int  `gorm:"not null"`
 	NationalityArea   Area `gorm:"foreignKey:NationalityAreaID"`
 
 	Goals            int `gorm:"not null"`

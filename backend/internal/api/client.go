@@ -35,7 +35,7 @@ func NewClientFromEnv() *Client {
 	config := NewConfigFromEnv()
 	return &Client{
 		config:     config,
-		httpClient: &http.Client{Timeout: config.Timeout},
+		httpClient: newRateLimitedHTTPClient(config.Timeout),
 	}
 }
 
@@ -62,10 +62,11 @@ func (c *Client) fetchWithQuery(path string, out any, queryParamsToAdd map[strin
 		return fmt.Errorf("failed to send request: %w", err)
 	}
 
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("request failed with status %s", resp.Status)
 	}
-	defer resp.Body.Close()
 	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
 		return fmt.Errorf("failed to decode response from %s: %w", path, err)
 	}
