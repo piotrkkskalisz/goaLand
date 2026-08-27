@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { MainPage } from "./pages/main-page";
 import { CompetitionResultsPage } from "./pages/competition-results-page";
 import { CompetitionLayout } from "./layouts/competition-layout";
+import { CompetitionMatchesPage } from "./pages/competition-matches-page";
 
 export const router = createBrowserRouter([
   {
@@ -9,7 +10,7 @@ export const router = createBrowserRouter([
     Component: MainPage,
   },
   {
-    path: "/:competitionCode/:startYear",
+    path: "/:competitionID/:startYear",
     Component: CompetitionLayout,
     children: [
       {
@@ -18,7 +19,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "mecze",
-        Component: CompetitionResultsPage,
+        Component: CompetitionMatchesPage,
       },
       {
         path: "tabela",
