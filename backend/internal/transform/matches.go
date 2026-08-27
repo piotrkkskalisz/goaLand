@@ -4,14 +4,15 @@ import (
 	"backend/internal/database"
 	"backend/internal/utils"
 	"slices"
-	"time"
 )
 
 type MatchResponse struct {
 	MatchID int `json:"id"`
 
-	StartTime time.Time `json:"startTime"`
-	Status    string    `json:"status"`
+	StartDate string `json:"date"`
+	StartTime string `json:"time"`
+
+	Status string `json:"status"`
 
 	HomeTeam string `json:"homeTeam"`
 	AwayTeam string `json:"awayTeam"`
@@ -51,8 +52,10 @@ func createMatchResponse(match database.Match) MatchResponse {
 	return MatchResponse{
 		MatchID: match.MatchID,
 
-		StartTime: match.StartTime,
-		Status:    matchStatus(match.Status),
+		StartTime: match.StartTime.Format("15:04"),
+		StartDate: match.StartTime.Format("02.01.2006"),
+
+		Status: matchStatus(match.Status),
 
 		HomeTeam: match.HomeTeam.FullName,
 		AwayTeam: match.AwayTeam.FullName,
