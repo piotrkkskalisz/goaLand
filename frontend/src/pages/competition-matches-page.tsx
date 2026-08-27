@@ -1,8 +1,8 @@
-import { getRoundResults } from "../api/matches";
+import { getRoundMatches} from "../api/matches";
 import { CompetitionRoundMatchesPage } from "./competition-round-matches-page";
 
-export function CompetitionResultsPage(){
+export function CompetitionMatchesPage(){
     return < CompetitionRoundMatchesPage
-      fetchMatches={getRoundResults}
+      fetchMatches={getRoundMatches}
     />
 }
