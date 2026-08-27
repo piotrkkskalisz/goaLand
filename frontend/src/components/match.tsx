@@ -1,32 +1,7 @@
-type MatchBaseProps = {
-  date: string;
-  time: string;
-  homeTeam: string;
-  awayTeam: string;
-};
+import type { MatchData } from "../config/matches";
 
-type LiveMatchProps = MatchBaseProps & {
-  status: "live";
-  homeScore: number;
-  awayScore: number;
-};
 
-type FinishedMatchProps = MatchBaseProps & {
-  status: "finished";
-  homeScore: number;
-  awayScore: number;
-};
-
-type ScheduledMatchProps = MatchBaseProps & {
-  status: "scheduled";
-};
-
-export type MatchProps =
-  | LiveMatchProps
-  | FinishedMatchProps
-  | ScheduledMatchProps;
-
-export function Match(props: MatchProps) {
+export function Match(props: MatchData) {
   const isLive = props.status === "live";
   const score =
     props.status === "scheduled"
