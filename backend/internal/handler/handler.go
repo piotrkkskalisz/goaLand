@@ -2,6 +2,8 @@ package handler
 
 import (
 	"backend/internal/database"
+	"backend/internal/state"
+
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,11 +13,12 @@ import (
 )
 
 type Handler struct {
-	db *database.Client
+	db    *database.Client
+	store *state.Store
 }
 
-func NewHandler(db *database.Client) *Handler {
-	return &Handler{db: db}
+func NewHandler(db *database.Client, store *state.Store) *Handler {
+	return &Handler{db: db, store: store}
 }
 
 func WriteJSON(w http.ResponseWriter, status int, data any) {

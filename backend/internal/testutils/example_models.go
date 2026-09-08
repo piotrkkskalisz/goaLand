@@ -20,6 +20,8 @@ const EkstraklasaID = 1950
 
 const ArsenalID = 24
 const ManCityID = 25
+const ChelseaId = 26
+const LiverpoolID = 27
 
 const SakaID = 2
 
@@ -88,6 +90,18 @@ func Arsenal() database.Team {
 	}
 }
 
+func Chelsea() database.Team {
+	return database.Team{
+		TeamID:    ChelseaId,
+		FullName:  "Chelsea FC",
+		ShortName: "Chelsea",
+		Code:      "CHE",
+		Colors:    "Blue / White",
+		AreaID:    EnglandAreaID,
+		Stadium:   "Stamford Bridge",
+	}
+}
+
 func ManCity() database.Team {
 	return database.Team{
 		TeamID:    ManCityID,
@@ -96,6 +110,18 @@ func ManCity() database.Team {
 		Code:      "MCI",
 		Colors:    "Blue",
 		AreaID:    EnglandAreaID,
+	}
+}
+
+func Liverpool() database.Team {
+	return database.Team{
+		TeamID:    LiverpoolID,
+		FullName:  "Liverpool FC",
+		ShortName: "Liverpool",
+		Code:      "LIV",
+		Colors:    "Red",
+		AreaID:    EnglandAreaID,
+		Stadium:   "Anfield",
 	}
 }
 
@@ -141,4 +167,8 @@ func NewGoalScorer() database.GoalScorer {
 		Assists:           5,
 		GoalsFromPenalty:  0,
 	}
+}
+
+func PointerToInt(value int) *int {
+	return &value
 }

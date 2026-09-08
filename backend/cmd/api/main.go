@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/internal/api"
+	"backend/internal/state"
 	"backend/internal/sync"
 	"context"
 	"log"
@@ -16,7 +17,6 @@ const (
 )
 
 func main() {
-
 	db, err := database.NewClientFromEnv()
 	if err != nil {
 		log.Fatal(err)
@@ -34,7 +34,13 @@ func main() {
 		}
 	}
 
-	server := server.NewServer(db)
+	ctx := context.Background()
+	store, err := state.CreateStore(ctx, db)
+
+	server := server.NewServer(db, store)
+	if err != nil {
+		log.Fatal(store)
+	}
 
 	log.Println("Starting server on :8080")
 

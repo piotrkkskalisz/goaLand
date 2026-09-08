@@ -11,11 +11,19 @@ import (
 func (c *Client) GetEditionMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
 	statuses := slices.Concat(utils.UpcomingMatchStatuses, utils.LiveMatchStatuses)
 
-	return c.getEditionMatches(ctx, competitionID, startYear, statuses)
+	return c.GetEditionMatchesWithStatus(ctx, competitionID, startYear, statuses)
+}
+
+func (c *Client) GetEditionUpcommingMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+	return c.GetEditionMatchesWithStatus(ctx, competitionID, startYear, utils.UpcomingMatchStatuses)
+}
+
+func (c *Client) GetEditionLiveMatches(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
+	return c.GetEditionMatchesWithStatus(ctx, competitionID, startYear, utils.LiveMatchStatuses)
 }
 
 func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startYear int) ([]Match, error) {
-	matches, err := c.getEditionMatches(ctx, competitionID, startYear, utils.FinishedMatchStatuses)
+	matches, err := c.GetEditionMatchesWithStatus(ctx, competitionID, startYear, utils.FinishedMatchStatuses)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +32,7 @@ func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startY
 	return matches, nil
 }
 
-func (c *Client) getEditionMatches(ctx context.Context, competitionID int, startYear int,
+func (c *Client) GetEditionMatchesWithStatus(ctx context.Context, competitionID int, startYear int,
 	statuses []string) ([]Match, error) {
 	var matches []Match
 	if err := c.List(ctx, &matches, Filter{
