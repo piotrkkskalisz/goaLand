@@ -3,6 +3,7 @@ package server
 import (
 	"backend/internal/database"
 	"backend/internal/handler"
+	"backend/internal/state"
 	"net/http"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -11,7 +12,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewRouter(c *database.Client) http.Handler {
+func NewRouter(db *database.Client, store *state.Store) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
@@ -23,7 +24,7 @@ func NewRouter(c *database.Client) http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	handler := handler.NewHandler(c)
+	handler := handler.NewHandler(db, store)
 
 	//example simply endpoint
 	r.Get("/health", handler.GetHealth)

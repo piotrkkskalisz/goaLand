@@ -2,6 +2,7 @@ package server
 
 import (
 	"backend/internal/database"
+	"backend/internal/state"
 	"net/http"
 )
 
@@ -11,8 +12,8 @@ type Server struct {
 	*http.Server
 }
 
-func NewServer(c *database.Client) *Server {
-	router := NewRouter(c)
+func NewServer(db *database.Client, store *state.Store) *Server {
+	router := NewRouter(db, store)
 
 	return &Server{
 		Server: &http.Server{
