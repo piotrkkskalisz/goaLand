@@ -71,8 +71,10 @@ func TestInitCompetition(t *testing.T) {
 	s.areasByName[testutils.EnglandName] = testutils.EnglandAreaID
 
 	competition := testutils.NewCompetition()
+	expectedCompetition := competition
+	expectedCompetition.Area = database.Area{}
 
-	dbMock.EXPECT().Save(ctx, []database.Competition{competition}).Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Competition{expectedCompetition}).Return(nil)
 
 	id, err := s.initCompetition(ctx, competition.Code)
 	require.NoError(t, err)
@@ -105,6 +107,8 @@ func TestInitCompetitions(t *testing.T) {
 
 	premierLeague := testutils.PremierLeague()
 	ekstraklasa := testutils.Ekstraklasa()
+	expectedPremierLeague := premierLeague
+	expectedPremierLeague.Area = database.Area{}
 
 	apiMock.EXPECT().FetchCompetitions().Return([]api.Competition{
 		{
@@ -130,7 +134,7 @@ func TestInitCompetitions(t *testing.T) {
 		},
 	}, nil)
 
-	dbMock.EXPECT().Save(ctx, []database.Competition{premierLeague}).Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Competition{expectedPremierLeague}).Return(nil)
 
 	err := s.initCompetitions(ctx, map[string]struct{}{
 		premierLeague.Code: {},
@@ -161,6 +165,10 @@ func TestInitMatches(t *testing.T) {
 	defer ctrl.Finish()
 
 	match := testutils.NewMatch()
+	expectedMatch := match
+	expectedMatch.HomeTeam = database.Team{}
+	expectedMatch.AwayTeam = database.Team{}
+	expectedMatch.Edition = database.Edition{}
 
 	apiMatch := api.Match{
 		ID:       match.MatchID,
@@ -177,7 +185,7 @@ func TestInitMatches(t *testing.T) {
 
 	apiMock.EXPECT().FetchMatches(testutils.PremierLeagueCode, testutils.Year).Return([]api.Match{apiMatch}, nil)
 
-	dbMock.EXPECT().Save(ctx, []database.Match{match}).Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.Match{expectedMatch}).Return(nil)
 
 	err := s.initMatches(ctx, Season{
 		CompetitionID:   testutils.PremierLeagueID,
@@ -194,31 +202,48 @@ func TestInitGoalScorers(t *testing.T) {
 	ctrl, apiMock, dbMock, s := testSync(t)
 	defer ctrl.Finish()
 
-	scorer := testutils.NewGoalScorer()
-
-	assists := scorer.Assists
+	player := testutils.NewPlayer()
+	seasonPlayer := testutils.NewSeasonPlayer()
 
 	apiScorer := api.GoalScorer{
-		Goals:     scorer.Goals,
-		Assists:   &assists,
-		Penalties: nil,
+		Player: api.GoalScorerPlayer{
+			ID:          player.PlayerID,
+			Name:        player.Name,
+			Nationality: testutils.EnglandName,
+			Section:     player.Position,
+		},
+		Goals:     seasonPlayer.Goals,
+		Assists:   seasonPlayer.Assists,
+		Penalties: seasonPlayer.GoalsFromPenalty,
 	}
 
-	apiScorer.Player.ID = scorer.GoalScorerID
-	apiScorer.Player.Name = scorer.Name
-	apiScorer.Player.Nationality = testutils.EnglandName
-
-	apiScorer.Team.ID = scorer.TeamID
+	apiScorer.Team.ID = seasonPlayer.TeamID
 
 	s.areasByName[testutils.EnglandName] = testutils.EnglandAreaID
 
-	expected := scorer
+	expectedPlayer := database.Player{
+		PlayerID:          player.PlayerID,
+		Name:              player.Name,
+		Position:          player.Position,
+		NationalityAreaID: player.NationalityAreaID,
+	}
+	expectedSeasonPlayer := database.SeasonPlayer{
+		PlayerID:         seasonPlayer.PlayerID,
+		TeamID:           seasonPlayer.TeamID,
+		CompetitionID:    seasonPlayer.CompetitionID,
+		StartSeasonYear:  seasonPlayer.StartSeasonYear,
+		Goals:            seasonPlayer.Goals,
+		Assists:          seasonPlayer.Assists,
+		GoalsFromPenalty: seasonPlayer.GoalsFromPenalty,
+	}
 
 	apiMock.EXPECT().
 		FetchGoalScorers(testutils.PremierLeagueCode, testutils.Year, defaultGoalScorerLimit).
 		Return([]api.GoalScorer{apiScorer}, nil)
 
-	dbMock.EXPECT().Save(ctx, []database.GoalScorer{expected}).
+	dbMock.EXPECT().Save(ctx, []database.Player{expectedPlayer}).
+		Return(nil)
+	dbMock.EXPECT().Save(ctx, []database.SeasonPlayer{expectedSeasonPlayer}).
 		Return(nil)
 
 	err := s.initGoalScorers(ctx, Season{
