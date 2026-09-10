@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,10 +24,19 @@ func newRateLimitedHTTPClient(timeout time.Duration) *RateLimitedHTTPClient {
 	}
 }
 
+func (c *RateLimitedHTTPClient) sendQuerry(req *http.Request) (*http.Response, error) {
+	resp, err := c.httpClient.Do(req)
+	if errors.Is(err, context.DeadlineExceeded) {
+		log.Print("context deadline exceeded, trying again")
+		return c.httpClient.Do(req)
+	}
+	return resp, err
+}
+
 func (c *RateLimitedHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	c.wait()
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.sendQuerry(req)
 	if err != nil {
 		return nil, err
 	}
