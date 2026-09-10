@@ -4,6 +4,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/state/table/mocks"
 	"backend/internal/testutils"
+	"backend/internal/utils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,8 +37,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   arsenal,
 			AwayTeamID: manCity.TeamID,
 			AwayTeam:   manCity,
-			HomeGoals:  testutils.PointerToInt(2),
-			AwayGoals:  testutils.PointerToInt(1),
+			HomeGoals:  utils.PointerToInt(2),
+			AwayGoals:  utils.PointerToInt(1),
 			Status:     "FINISHED",
 		}, {
 			MatchID:    2,
@@ -45,8 +46,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   manCity,
 			AwayTeamID: arsenal.TeamID,
 			AwayTeam:   arsenal,
-			HomeGoals:  testutils.PointerToInt(2),
-			AwayGoals:  testutils.PointerToInt(0),
+			HomeGoals:  utils.PointerToInt(2),
+			AwayGoals:  utils.PointerToInt(0),
 			Status:     "FINISHED",
 		}, {
 			MatchID:    3,
@@ -54,8 +55,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   arsenal,
 			AwayTeamID: chelsea.TeamID,
 			AwayTeam:   chelsea,
-			HomeGoals:  testutils.PointerToInt(5),
-			AwayGoals:  testutils.PointerToInt(1),
+			HomeGoals:  utils.PointerToInt(5),
+			AwayGoals:  utils.PointerToInt(1),
 			Status:     "FINISHED",
 		}, {
 			MatchID:    4,
@@ -63,8 +64,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   chelsea,
 			AwayTeamID: arsenal.TeamID,
 			AwayTeam:   arsenal,
-			HomeGoals:  testutils.PointerToInt(2),
-			AwayGoals:  testutils.PointerToInt(2),
+			HomeGoals:  utils.PointerToInt(2),
+			AwayGoals:  utils.PointerToInt(2),
 			Status:     "FINISHED",
 		}, {
 			MatchID:    5,
@@ -72,8 +73,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   manCity,
 			AwayTeamID: chelsea.TeamID,
 			AwayTeam:   chelsea,
-			HomeGoals:  testutils.PointerToInt(3),
-			AwayGoals:  testutils.PointerToInt(1),
+			HomeGoals:  utils.PointerToInt(3),
+			AwayGoals:  utils.PointerToInt(1),
 			Status:     "FINISHED",
 		}, {
 			MatchID:    6,
@@ -81,8 +82,8 @@ func TestFullMatch(t *testing.T) {
 			HomeTeam:   chelsea,
 			AwayTeamID: manCity.TeamID,
 			AwayTeam:   manCity,
-			HomeGoals:  testutils.PointerToInt(2),
-			AwayGoals:  testutils.PointerToInt(2),
+			HomeGoals:  utils.PointerToInt(2),
+			AwayGoals:  utils.PointerToInt(2),
 			Status:     "FINISHED",
 		},
 	}
@@ -137,8 +138,8 @@ func TestPartMatch(t *testing.T) {
 			HomeTeam:   arsenal,
 			AwayTeamID: manCity.TeamID,
 			AwayTeam:   manCity,
-			HomeGoals:  testutils.PointerToInt(1),
-			AwayGoals:  testutils.PointerToInt(0),
+			HomeGoals:  utils.PointerToInt(1),
+			AwayGoals:  utils.PointerToInt(0),
 			Status:     "FINISHED",
 		},
 	}
@@ -149,8 +150,8 @@ func TestPartMatch(t *testing.T) {
 			HomeTeam:   manCity,
 			AwayTeamID: chelsea.TeamID,
 			AwayTeam:   chelsea,
-			HomeGoals:  testutils.PointerToInt(4),
-			AwayGoals:  testutils.PointerToInt(0),
+			HomeGoals:  utils.PointerToInt(4),
+			AwayGoals:  utils.PointerToInt(0),
 			Status:     "IN_PLAY",
 		},
 	}
