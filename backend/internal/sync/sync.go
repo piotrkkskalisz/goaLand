@@ -4,6 +4,7 @@ import (
 	"backend/internal/api"
 	"backend/internal/database"
 	"context"
+	"time"
 )
 
 type SeasonTarget struct {
@@ -76,7 +77,6 @@ func (targets SeasonTargets) competitionCodes() map[string]struct{} {
 	return set
 }
 
-// #TODO reduce complexity from O(n)
 func (seasons Seasons) CompetitionID(code string) (int, bool) {
 	for _, season := range seasons {
 		if season.CompetitionCode == code {
@@ -85,4 +85,15 @@ func (seasons Seasons) CompetitionID(code string) (int, bool) {
 	}
 
 	return 0, false
+}
+
+func CurrentSeasonStartYear(now time.Time) int {
+	if now.Month() <= time.June {
+		return now.Year() - 1
+	}
+	return now.Year()
+}
+
+func isCurrentSeason(startYear int, now time.Time) bool {
+	return startYear == CurrentSeasonStartYear(now)
 }

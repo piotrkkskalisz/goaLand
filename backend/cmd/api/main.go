@@ -23,7 +23,7 @@ func main() {
 	}
 
 	if resetDatabaseOnStart {
-		if err := resetDatabase(db); err != nil {
+		if err := db.ResetDatabase(); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -47,28 +47,6 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func resetDatabase(db *database.Client) error {
-	if err := db.DB().Migrator().DropTable(
-		&database.GoalScorer{},
-		&database.Match{},
-		&database.Edition{},
-		&database.Team{},
-		&database.Competition{},
-		&database.Area{},
-	); err != nil {
-		return err
-	}
-
-	return db.DB().AutoMigrate(
-		&database.Area{},
-		&database.Competition{},
-		&database.Edition{},
-		&database.Team{},
-		&database.Match{},
-		&database.GoalScorer{},
-	)
 }
 
 func fetchData(db *database.Client) error {

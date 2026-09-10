@@ -6,6 +6,13 @@ type TeamsResponse struct {
 	Teams []Team `json:"teams"`
 }
 
+type Player struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Nationality string `json:"nationality"`
+	Position    string `json:"position"`
+}
+
 type Team struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
@@ -18,6 +25,8 @@ type Team struct {
 	} `json:"area"`
 
 	Venue string `json:"venue"`
+
+	Players []Player `json:"squad"`
 }
 
 func (c *Client) FetchTeams(competitionCode string, seasonYear int) ([]Team, error) {

@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"backend/internal/database"
+	"backend/internal/utils"
 	"time"
 )
 
@@ -60,6 +61,7 @@ func Ekstraklasa() database.Competition {
 		Code:            "EK",
 		CompetitionType: "LEAGUE",
 		AreaID:          PolandAreaID,
+		Area:            Poland(),
 	}
 }
 
@@ -70,6 +72,7 @@ func PremierLeague() database.Competition {
 		Code:            PremierLeagueCode,
 		CompetitionType: "LEAGUE",
 		AreaID:          EnglandAreaID,
+		Area:            England(),
 	}
 }
 
@@ -86,6 +89,7 @@ func Arsenal() database.Team {
 		Code:      "ARS",
 		Colors:    "Red / White",
 		AreaID:    EnglandAreaID,
+		Area:      England(),
 		Stadium:   "Emirates Stadium",
 	}
 }
@@ -98,6 +102,7 @@ func Chelsea() database.Team {
 		Code:      "CHE",
 		Colors:    "Blue / White",
 		AreaID:    EnglandAreaID,
+		Area:      England(),
 		Stadium:   "Stamford Bridge",
 	}
 }
@@ -110,6 +115,7 @@ func ManCity() database.Team {
 		Code:      "MCI",
 		Colors:    "Blue",
 		AreaID:    EnglandAreaID,
+		Area:      England(),
 	}
 }
 
@@ -121,6 +127,7 @@ func Liverpool() database.Team {
 		Code:      "LIV",
 		Colors:    "Red",
 		AreaID:    EnglandAreaID,
+		Area:      England(),
 		Stadium:   "Anfield",
 	}
 }
@@ -129,6 +136,7 @@ func Liverpool() database.Team {
 func NewEdition() database.Edition {
 	return database.Edition{
 		CompetitionID: PremierLeagueID,
+		Competition:   PremierLeague(),
 		StartYear:     Year,
 		Status:        "FINISHED",
 	}
@@ -144,7 +152,10 @@ func NewMatch() database.Match {
 		CompetitionID:   PremierLeagueID,
 		StartSeasonYear: Year,
 		HomeTeamID:      ArsenalID,
+		HomeTeam:        Arsenal(),
 		AwayTeamID:      ManCityID,
+		AwayTeam:        ManCity(),
+		Edition:         NewEdition(),
 		HomeGoals:       &homeGoals,
 		AwayGoals:       &awayGoals,
 		Status:          "FINISHED",
@@ -155,20 +166,26 @@ func NewMatch() database.Match {
 }
 
 // NewGoalScorer creates Bukayo Saka goal scorer.
-func NewGoalScorer() database.GoalScorer {
-	return database.GoalScorer{
-		GoalScorerID:      SakaID,
-		CompetitionID:     PremierLeagueID,
-		StartSeasonYear:   Year,
-		TeamID:            ArsenalID,
+func NewPlayer() database.Player {
+	return database.Player{
+		PlayerID:          SakaID,
 		Name:              "Bukayo Saka",
 		NationalityAreaID: EnglandAreaID,
-		Goals:             10,
-		Assists:           5,
-		GoalsFromPenalty:  0,
+		NationalityArea:   England(),
 	}
 }
 
-func PointerToInt(value int) *int {
-	return &value
+func NewSeasonPlayer() database.SeasonPlayer {
+	return database.SeasonPlayer{
+		PlayerID:         SakaID,
+		Player:           NewPlayer(),
+		CompetitionID:    PremierLeagueID,
+		StartSeasonYear:  Year,
+		Edition:          NewEdition(),
+		TeamID:           ArsenalID,
+		Team:             Arsenal(),
+		Goals:            utils.PointerToInt(10),
+		Assists:          utils.PointerToInt(5),
+		GoalsFromPenalty: utils.PointerToInt(0),
+	}
 }

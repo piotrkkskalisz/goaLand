@@ -15,6 +15,11 @@ test:
 	@echo "Testing..."
 	@go test ./... -v
 
+# Run unit and integration tests
+all-test:
+	@echo "Running all tests..."
+	@go test -p 1 -tags=integration ./... -v
+
 # Integrations Tests for the application
 itest:
 	@echo "Running integration tests..."
@@ -29,4 +34,4 @@ clean:
 watch:
 	@air
 
-.PHONY: build run test clean watch docker-up docker-down itest
+.PHONY: build run test all-test clean watch docker-up docker-down itest

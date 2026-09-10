@@ -6,18 +6,21 @@ type GoalScorersResponse struct {
 	Scorers []GoalScorer `json:"scorers"`
 }
 
+type GoalScorerPlayer struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Nationality string `json:"nationality"`
+	Section     string `json:"section"`
+}
+
 type GoalScorer struct {
-	Player struct {
-		ID          int    `json:"id"`
-		Name        string `json:"name"`
-		Nationality string `json:"nationality"`
-	} `json:"player"`
+	Player GoalScorerPlayer `json:"player"`
 
 	Team struct {
 		ID int `json:"id"`
 	} `json:"team"`
 
-	Goals int `json:"goals"`
+	Goals *int `json:"goals"`
 
 	Assists *int `json:"assists"`
 

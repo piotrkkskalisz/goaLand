@@ -93,8 +93,8 @@ func (c *Client) GetTeamsMatches(ctx context.Context, teamID int) ([]Match, erro
 	return matches, err
 }
 
-func (c *Client) GetEditionGoalScorers(ctx context.Context, competitionID int, startYear int) ([]GoalScorer, error) {
-	var goalScorers []GoalScorer
+func (c *Client) GetEditionPlayers(ctx context.Context, competitionID int, startYear int) ([]SeasonPlayer, error) {
+	var goalScorers []SeasonPlayer
 	err := c.List(ctx, &goalScorers, Filter{
 		"competition_id":    competitionID,
 		"start_season_year": startYear,

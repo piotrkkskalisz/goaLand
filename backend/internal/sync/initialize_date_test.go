@@ -16,23 +16,27 @@ func TestInitializeData(t *testing.T) {
 	dbClient, err := database.NewClientFromEnv()
 	require.NoError(t, err)
 
-	testutils.Database_init(t, dbClient)
+	require.NoError(t, dbClient.DeleteDatabase())
+	require.NoError(t, dbClient.CreateDatabase())
 
 	s, err := NewFromEnv()
 	require.NoError(t, err)
 
-	previosYear := testutils.Year - 1
+	previousYear := testutils.Year - 1
 	err = s.InitializeData(ctx, SeasonTargets{
 		{
 			CompetitionCode: testutils.PremierLeagueCode,
 			StartYear:       testutils.Year,
 		}, {
 			CompetitionCode: testutils.PremierLeagueCode,
-			StartYear:       previosYear,
+			StartYear:       previousYear,
 		},
 	})
 	require.NoError(t, err)
+
+	verifyDatas(t, dbClient)
 }
+
 func verifyDatas(t *testing.T, dbClient *database.Client) {
 	t.Helper()
 
@@ -46,7 +50,7 @@ func verifyDatas(t *testing.T, dbClient *database.Client) {
 
 	var editions []database.Edition
 	require.NoError(t, dbClient.DB().Find(&editions).Error)
-	require.Len(t, editions, 1)
+	require.Len(t, editions, 2)
 
 	var teams []database.Team
 	require.NoError(t, dbClient.DB().Find(&teams).Error)
@@ -56,12 +60,23 @@ func verifyDatas(t *testing.T, dbClient *database.Client) {
 	require.NoError(t, dbClient.DB().Find(&matches).Error)
 	require.NotEmpty(t, matches)
 
-	var scorers []database.GoalScorer
-	require.NoError(t, dbClient.DB().Find(&scorers).Error)
-	require.NotEmpty(t, scorers)
+	var players []database.Player
+	require.NoError(t, dbClient.DB().Find(&players).Error)
+	require.NotEmpty(t, players)
+
+	var seasonPlayers []database.SeasonPlayer
+	require.NoError(t, dbClient.DB().Find(&seasonPlayers).Error)
+	require.NotEmpty(t, seasonPlayers)
 
 	require.Equal(t, "Premier League", competitions[0].Name)
-	require.Equal(t, testutils.Year, editions[0].StartYear)
+	require.ElementsMatch(t,
+		[]int{testutils.Year, testutils.Year - 1},
+		[]int{editions[0].StartYear, editions[1].StartYear},
+	)
 
-	require.Contains(t, []string{"England", "Poland"}, areas[0].Name)
+	areaNames := make([]string, 0, len(areas))
+	for _, area := range areas {
+		areaNames = append(areaNames, area.Name)
+	}
+	require.Contains(t, areaNames, testutils.EnglandName)
 }

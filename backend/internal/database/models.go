@@ -10,7 +10,7 @@ type Area struct {
 
 	Competitions []Competition
 	Teams        []Team
-	GoalScorers  []GoalScorer `gorm:"foreignKey:NationalityAreaID"`
+	Players      []Player `gorm:"foreignKey:NationalityAreaID"`
 }
 
 type Competition struct {
@@ -41,7 +41,7 @@ type Team struct {
 	HomeMatches []Match `gorm:"foreignKey:HomeTeamID"`
 	AwayMatches []Match `gorm:"foreignKey:AwayTeamID"`
 
-	GoalScorers []GoalScorer
+	SeasonPlayers []SeasonPlayer
 }
 
 type Edition struct {
@@ -51,8 +51,8 @@ type Edition struct {
 	StartYear int    `gorm:"primaryKey"`
 	Status    string `gorm:"not null"`
 
-	Matches     []Match      `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
-	GoalScorers []GoalScorer `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
+	Matches       []Match        `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
+	SeasonPlayers []SeasonPlayer `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 }
 
 type Match struct {
@@ -82,8 +82,20 @@ type Match struct {
 	Stage    string `gorm:"not null"`
 }
 
-type GoalScorer struct {
-	GoalScorerID int `gorm:"primaryKey"`
+type Player struct {
+	PlayerID int    `gorm:"primaryKey"`
+	Name     string `gorm:"not null"`
+	Position string `gorm:"not null"`
+
+	NationalityAreaID int  `gorm:"not null"`
+	NationalityArea   Area `gorm:"foreignKey:NationalityAreaID"`
+
+	SeasonPlayers []SeasonPlayer
+}
+
+type SeasonPlayer struct {
+	PlayerID int    `gorm:"primaryKey"`
+	Player   Player `gorm:"foreignKey:PlayerID"`
 
 	TeamID int `gorm:"not null"`
 	Team   Team
@@ -93,12 +105,7 @@ type GoalScorer struct {
 
 	Edition Edition `gorm:"foreignKey:CompetitionID,StartSeasonYear;references:CompetitionID,StartYear"`
 
-	Name string `gorm:"not null"`
-
-	NationalityAreaID int  `gorm:"not null"`
-	NationalityArea   Area `gorm:"foreignKey:NationalityAreaID"`
-
-	Goals            int `gorm:"not null"`
-	Assists          int `gorm:"not null"`
-	GoalsFromPenalty int `gorm:"not null"`
+	Goals            *int
+	Assists          *int
+	GoalsFromPenalty *int
 }
