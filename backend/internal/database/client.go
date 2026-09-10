@@ -116,8 +116,14 @@ func (c *Client) GetMatch(ctx context.Context, id int, preloads ...string) (*Mat
 	return &match, err
 }
 
-func (c *Client) GetGoalScorer(ctx context.Context, id int, preloads ...string) (*GoalScorer, error) {
-	var scorer GoalScorer
+func (c *Client) GetPlayer(ctx context.Context, id int, preloads ...string) (*Player, error) {
+	var scorer Player
+	err := c.Get(ctx, &scorer, Filter{"goal_scorer_id": id}, preloads...)
+	return &scorer, err
+}
+
+func (c *Client) GetSeasonPlayer(ctx context.Context, id int, preloads ...string) (*SeasonPlayer, error) {
+	var scorer SeasonPlayer
 	err := c.Get(ctx, &scorer, Filter{"goal_scorer_id": id}, preloads...)
 	return &scorer, err
 }
