@@ -165,7 +165,9 @@ func TestFetchGoalScorers(t *testing.T) {
 		require.NotZero(t, scorer.Player.ID)
 		require.NotZero(t, scorer.Team.ID)
 
-		require.GreaterOrEqual(t, scorer.Goals, 0)
+		if scorer.Goals != nil {
+			require.GreaterOrEqual(t, *scorer.Goals, 0)
+		}
 
 		require.NotEmpty(t, scorer.Player.Nationality)
 		require.NotEmpty(t, scorer.Player.Name)
