@@ -3,6 +3,8 @@ package transform
 import (
 	"backend/internal/database"
 	"backend/internal/utils"
+	"cmp"
+	"slices"
 )
 
 type CompetitionEdition struct {
@@ -14,6 +16,11 @@ type CompetitionEdition struct {
 
 	StartYear int    `json:"startYear"`
 	Status    string `json:"status"`
+}
+
+type GoalScorer struct {
+	Position int `json:"position"`
+	Goals    int `json:"goals"`
 }
 
 func createCompetitionEdition(competition database.Competition, edition database.Edition) CompetitionEdition {
@@ -49,4 +56,38 @@ func GetCompetitionEdition(competitions []database.Competition) []CompetitionEdi
 	}
 
 	return response
+}
+
+func GetEditionGoalScorers(players []database.SeasonPlayer) []GoalScorer {
+	if len(players) == 0 {
+		return nil
+	}
+
+	slices.SortFunc(players, func(a, b database.SeasonPlayer) int {
+		if result := cmp.Compare(*b.Goals, *a.Goals); result != 0 {
+			return result
+		}
+		return cmp.Compare(a.PlayerID, b.PlayerID)
+	})
+
+	var goalScorers []GoalScorer
+	position := 1
+
+	goalScorers = append(goalScorers, GoalScorer{
+		Position: position,
+		Goals:    *players[0].Goals,
+	})
+
+	for i := range len(players) - 1 {
+		if *players[i].Goals != *players[i+1].Goals {
+			position += 1
+		}
+		goalScorers = append(goalScorers, GoalScorer{
+			Position: position,
+			Goals:    *players[i+1].Goals,
+		})
+	}
+
+	return goalScorers
+
 }
