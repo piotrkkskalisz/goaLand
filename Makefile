@@ -3,6 +3,8 @@
 # Create .env file from .env.example file
 env:
 	@cp --update=none .env.example .env
+	@cp --update=none frontend/.env.example frontend/.env
+
 
 # Create DB container
 docker-up:
@@ -22,7 +24,10 @@ run:
 test:
 	@$(MAKE) -C backend test
 
+all-test:
+	@$(MAKE) -C backend all-test
+
 watch:
 	@$(MAKE) -C backend watch
 	
-.PHONY: env docker-up docker-down build run test watch
+.PHONY: env docker-up docker-down build run test all-test watch
