@@ -20,6 +20,7 @@ func intOrZero(value *int) int {
 }
 
 func (s *Sync) InitializeData(ctx context.Context, targets SeasonTargets) error {
+	now := time.Now()
 	if err := s.initAreas(ctx); err != nil {
 		return err
 	}
@@ -29,14 +30,14 @@ func (s *Sync) InitializeData(ctx context.Context, targets SeasonTargets) error 
 	}
 
 	for _, target := range targets {
-		if err := s.addSeason(ctx, target); err != nil {
+		if err := s.addSeason(ctx, now, target); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (s *Sync) addSeason(ctx context.Context, target SeasonTarget) error {
+func (s *Sync) addSeason(ctx context.Context, now time.Time, target SeasonTarget) error {
 	competitionID, ok := s.seasons.CompetitionID(target.CompetitionCode)
 	if !ok {
 		var err error
@@ -59,7 +60,7 @@ func (s *Sync) addSeason(ctx context.Context, target SeasonTarget) error {
 
 	s.seasons = append(s.seasons, season)
 
-	if err := s.initTeams(ctx, season); err != nil {
+	if err := s.initTeams(ctx, now, season); err != nil {
 		return err
 	}
 
@@ -162,15 +163,45 @@ func (s *Sync) initEdition(ctx context.Context, season Season) error {
 		Status:        utils.EditionStatus(startTime, endTime),
 	}
 
-	return s.databaseClient.Save(ctx, dbEdition)
+	return s.databaseClient.Save(ctx, &dbEdition)
 }
 
-func (s *Sync) initTeams(ctx context.Context, season Season) error {
+func (s *Sync) initPlayers(ctx context.Context, apiTeams []api.Team, season Season) error {
+	dbPlayers := make([]database.Player, 0, 0)
+	dbSeasonPlayers := make([]database.SeasonPlayer, 0, 0)
+
+	for _, team := range apiTeams {
+		for _, player := range team.Players {
+			if _, exist := s.areasByName[player.Nationality]; !exist {
+				return fmt.Errorf("Not found Area %s", player.Nationality)
+			}
+
+			dbPlayers = append(dbPlayers, database.Player{
+				PlayerID:          player.ID,
+				Name:              player.Name,
+				NationalityAreaID: s.areasByName[player.Nationality],
+				Position:          player.Position,
+			})
+			dbSeasonPlayers = append(dbSeasonPlayers, database.SeasonPlayer{
+				PlayerID:        player.ID,
+				TeamID:          team.ID,
+				CompetitionID:   season.CompetitionID,
+				StartSeasonYear: season.StartYear,
+			})
+
+		}
+	}
+	if err := s.databaseClient.Save(ctx, dbPlayers); err != nil {
+		return err
+	}
+	return s.databaseClient.Save(ctx, dbSeasonPlayers)
+}
+
+func (s *Sync) initTeams(ctx context.Context, now time.Time, season Season) error {
 	apiTeams, err := s.apiClient.FetchTeams(season.CompetitionCode, season.StartYear)
 	if err != nil {
 		return err
 	}
-
 	dbTeams := make([]database.Team, 0, len(apiTeams))
 
 	for _, team := range apiTeams {
@@ -185,7 +216,17 @@ func (s *Sync) initTeams(ctx context.Context, season Season) error {
 		})
 	}
 
-	return s.databaseClient.Save(ctx, dbTeams)
+	if err := s.databaseClient.Save(ctx, dbTeams); err != nil {
+		return err
+	}
+
+	if isCurrentSeason(season.StartYear, now) {
+		if err = s.initPlayers(ctx, apiTeams, season); err != nil {
+			return err
+		}
+	}
+	return nil
+
 }
 
 func (s *Sync) initMatches(ctx context.Context, season Season) error {
@@ -232,19 +273,30 @@ func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) er
 		return err
 	}
 
-	dbGoalScorers := make([]database.GoalScorer, 0, len(apiGoalScorers))
+	dbPlayers := make([]database.Player, 0, len(apiGoalScorers))
+	dbSeasonPlayers := make([]database.SeasonPlayer, 0, len(apiGoalScorers))
 
 	for _, scorer := range apiGoalScorers {
-		dbGoalScorers = append(dbGoalScorers, database.GoalScorer{
-			GoalScorerID:      scorer.Player.ID,
-			CompetitionID:     season.CompetitionID,
-			StartSeasonYear:   season.StartYear,
-			TeamID:            scorer.Team.ID,
-			NationalityAreaID: s.areasByName[scorer.Player.Nationality],
+		areaID, exists := s.areasByName[scorer.Player.Nationality]
+		if !exists {
+			return fmt.Errorf("not found area %s", scorer.Player.Nationality)
+		}
+
+		dbPlayers = append(dbPlayers, database.Player{
+			PlayerID:          scorer.Player.ID,
 			Name:              scorer.Player.Name,
-			Goals:             scorer.Goals,
-			Assists:           intOrZero(scorer.Assists),
-			GoalsFromPenalty:  intOrZero(scorer.Penalties),
+			Position:          scorer.Player.Section,
+			NationalityAreaID: areaID,
+		})
+
+		dbSeasonPlayers = append(dbSeasonPlayers, database.SeasonPlayer{
+			PlayerID:         scorer.Player.ID,
+			CompetitionID:    season.CompetitionID,
+			StartSeasonYear:  season.StartYear,
+			TeamID:           scorer.Team.ID,
+			Goals:            scorer.Goals,
+			Assists:          scorer.Assists,
+			GoalsFromPenalty: scorer.Penalties,
 		})
 	}
 
@@ -252,5 +304,9 @@ func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) er
 		return nil
 	}
 
-	return s.databaseClient.Save(ctx, dbGoalScorers)
+	if err := s.databaseClient.Save(ctx, dbPlayers); err != nil {
+		return err
+	}
+
+	return s.databaseClient.Save(ctx, dbSeasonPlayers)
 }
