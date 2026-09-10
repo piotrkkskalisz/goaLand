@@ -102,3 +102,16 @@ func (c *Client) GetEditionPlayers(ctx context.Context, competitionID int, start
 	)
 	return goalScorers, err
 }
+
+func (c *Client) GetEditionGoalScorers(ctx context.Context, competitionID int, startYear int) ([]SeasonPlayer, error) {
+	var goalScorers []SeasonPlayer
+	err := c.buildQuery(ctx, []string{"Player", "Team"}).
+		Where(Filter{
+			"competition_id":    competitionID,
+			"start_season_year": startYear,
+		}).
+		Where("goals IS NOT NULL").
+		Find(&goalScorers).Error
+
+	return goalScorers, err
+}
