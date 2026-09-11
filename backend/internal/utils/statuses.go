@@ -35,6 +35,12 @@ var DisplayableMatchStatuses = slices.Concat(
 	FinishedMatchStatuses,
 )
 
+var DisplayableMatchStatusesLists = [][]string{
+	UpcomingMatchStatuses,
+	LiveMatchStatuses,
+	FinishedMatchStatuses,
+}
+
 func EditionStatus(startDate time.Time, endDate time.Time) string {
 	now := time.Now()
 	if now.Before(startDate) {
