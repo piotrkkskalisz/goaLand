@@ -4,8 +4,10 @@ import (
 	"backend/internal/database"
 	"backend/internal/sync"
 	"backend/internal/transform"
+	"backend/internal/utils"
 	"context"
 	"net/http"
+	"slices"
 	"time"
 )
 
@@ -15,26 +17,30 @@ const (
 	FinishedStatus = "finished"
 )
 
+const maxMatchesOnTop = 50
+
 func (h *Handler) GetAllMatches(w http.ResponseWriter, r *http.Request) {
-	finishedMatches, ok := h.loadEditionMatches(w, r, h.db.GetEditionResult)
-	if !ok {
-		return
-	}
-	liveMatches, ok := h.loadEditionMatches(w, r, h.db.GetEditionLiveMatches)
-	if !ok {
-		return
+	ctx := r.Context()
+
+	startYear := sync.CurrentSeasonStartYear(time.Now())
+
+	var allMatches [][]transform.MatchResponse
+	for _, statuses := range utils.DisplayableMatchStatusesLists {
+		matches, err := h.db.GetAllMatchesWithStatus(ctx, startYear, statuses)
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if slices.Compare(statuses, utils.LiveMatchStatuses) == 0 {
+			allMatches = append(allMatches,
+				transform.GetFeaturedMatches(matches))
+		} else {
+			allMatches = append(allMatches,
+				transform.GetResponseMatchesWithLimit(matches, maxMatchesOnTop))
+		}
 	}
 
-	upcomingMatches, ok := h.loadEditionMatches(w, r, h.db.GetEditionUpcommingMatches)
-	if !ok {
-		return
-	}
-	matches := map[string][]database.Match{
-		UpcomingStatus: upcomingMatches,
-		LiveStatus:     liveMatches,
-		FinishedStatus: finishedMatches,
-	}
-	WriteJSON(w, http.StatusOK, matches)
+	WriteJSON(w, http.StatusOK, allMatches)
 }
 
 func (h *Handler) GetEditionResults(w http.ResponseWriter, r *http.Request) {
