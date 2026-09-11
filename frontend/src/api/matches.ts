@@ -20,3 +20,9 @@ export function getRoundResults(edition: Edition): Promise<RoundMatches[]> {
     `/competitions/${edition.id}/${edition.startYear}/results`,
   );
 }
+
+export function getAllMatches(): Promise<MatchData[][]> {
+  return get<MatchData[][]>(
+    `/all-matches`,
+  );
+}
