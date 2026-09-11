@@ -4,7 +4,7 @@ import { mainEditions } from "../config/editions";
 
 export function Sidebar() {
   return (
-    <aside className="flex h-[650px] w-[370px] flex-col items-center gap-[40px] px-[10px] py-[50px]">
+    <aside className="flex h-[650px] w-[370px] flex-col items-center gap-[30px] px-[10px] py-[50px]">
       {mainEditions.map((edition) => (
         <Link
           className="flex h-[60px] w-[350px] items-center gap-[30px] rounded-lg px-[10px] text-left transition-colors hover:bg-granit-800"

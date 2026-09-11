@@ -48,8 +48,9 @@
   --font-size-heading2: 36px;
   --font-size-primary: 24px;
   --font-size-secondary: 15px;
+  --font-size-third: 11px;
 
-  --font-weight-regular: 400;
+  --font-weight-regular: 300; /*change from 400*/
   --font-weight-medium: 500;
   --font-weight-bold: 700;
 
@@ -98,6 +99,11 @@
 
   .text-secondary {
     font-size: var(--font-size-secondary);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .text-third {
+    font-size: var(--font-size-third);
     font-weight: var(--font-weight-regular);
   }
 }

@@ -17,6 +17,9 @@ type MatchResponse struct {
 	HomeTeam string `json:"homeTeam"`
 	AwayTeam string `json:"awayTeam"`
 
+	HomeTeamCode string `json:"homeTeamCode"`
+	AwayTeamCode string `json:"awayTeamCode"`
+
 	HomeScore *int `json:"homeScore,omitempty"`
 	AwayScore *int `json:"awayScore,omitempty"`
 }
@@ -60,9 +63,28 @@ func createMatchResponse(match database.Match) MatchResponse {
 		HomeTeam: match.HomeTeam.FullName,
 		AwayTeam: match.AwayTeam.FullName,
 
+		HomeTeamCode: match.HomeTeam.Code,
+		AwayTeamCode: match.AwayTeam.Code,
+
 		HomeScore: match.HomeGoals,
 		AwayScore: match.AwayGoals,
 	}
+}
+
+func GetResponseMatchesWithLimit(matches []database.Match, limit int) []MatchResponse {
+	if len(matches) > limit {
+		matches = matches[:limit]
+	}
+
+	return GetResponseMatches(matches)
+}
+
+func GetResponseMatches(matches []database.Match) []MatchResponse {
+	response := make([]MatchResponse, 0, len(matches))
+	for _, match := range matches {
+		response = append(response, createMatchResponse(match))
+	}
+	return response
 }
 
 func GroupByRounds(matches []database.Match) []RoundMatchesResponse {

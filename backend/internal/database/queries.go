@@ -34,12 +34,24 @@ func (c *Client) GetEditionResult(ctx context.Context, competitionID int, startY
 
 func (c *Client) GetEditionMatchesWithStatus(ctx context.Context, competitionID int, startYear int,
 	statuses []string) ([]Match, error) {
-	var matches []Match
-	if err := c.List(ctx, &matches, Filter{
+	return c.GetMatches(ctx, Filter{
+		"start_season_year": startYear,
 		"competition_id":    competitionID,
+		"status":            statuses,
+	})
+}
+
+func (c *Client) GetAllMatchesWithStatus(ctx context.Context, startYear int,
+	statuses []string) ([]Match, error) {
+	return c.GetMatches(ctx, Filter{
 		"start_season_year": startYear,
 		"status":            statuses,
-	}, preloadTeams...); err != nil {
+	})
+}
+
+func (c *Client) GetMatches(ctx context.Context, filter Filter) ([]Match, error) {
+	var matches []Match
+	if err := c.List(ctx, &matches, filter, preloadTeams...); err != nil {
 		return nil, err
 	}
 
