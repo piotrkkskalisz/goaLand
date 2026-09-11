@@ -5,6 +5,10 @@ export type MatchData = {
   status: "scheduled" | "live" | "finished";
   homeTeam: string;
   awayTeam: string;
+  
+  homeTeamCode: string;
+  awayTeamCode: string;
+
   homeScore?: number;
   awayScore?: number;
 };
