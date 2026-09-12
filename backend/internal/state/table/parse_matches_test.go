@@ -5,6 +5,7 @@ import (
 	"backend/internal/state/table/mocks"
 	"backend/internal/testutils"
 	"backend/internal/utils"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,9 +15,15 @@ import (
 func tableTestHelper(t *testing.T, finishedMatches, liveMatches, upcomingMatches []database.Match, expectedClubs []*Club) {
 	t.Helper()
 
+	reversedFinishedMatches := make([]database.Match, len(finishedMatches))
+	// 2. Kopiujemy elementy z oryginalnego slice'a
+	copy(reversedFinishedMatches, finishedMatches)
+	// 3. Odwracamy kopię w miejscu
+	slices.Reverse(reversedFinishedMatches)
+
 	ctrl := gomock.NewController(t)
 	dbMock := mocks.NewMockDatabase(ctrl)
-	dbMock.EXPECT().GetEditionResult(t.Context(), 1, 2025).Return(finishedMatches, nil)
+	dbMock.EXPECT().GetEditionResult(t.Context(), 1, 2025).Return(reversedFinishedMatches, nil)
 	dbMock.EXPECT().GetEditionLiveMatches(t.Context(), 1, 2025).Return(liveMatches, nil)
 	dbMock.EXPECT().GetEditionUpcommingMatches(t.Context(), 1, 2025).Return(upcomingMatches, nil)
 
