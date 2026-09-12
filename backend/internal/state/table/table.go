@@ -75,7 +75,7 @@ func CreateTable(
 		return nil, err
 	}
 
-	allMatches := slices.Concat(finishedMatches, liveMatches)
+	allMatches := slices.Concat(liveMatches, finishedMatches)
 	clubsMap := make(map[int]*Club)
 	matches := make(map[int]map[int]database.Match)
 
@@ -102,6 +102,7 @@ func CreateTable(
 	}
 	var clubs []*Club
 	for _, club := range clubsMap {
+		slices.Reverse(club.Form)
 		clubs = append(clubs, club)
 	}
 
