@@ -200,12 +200,12 @@ func (h *Handler) GetEditionTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, ok := h.store.GetTable(competitionID, startYear)
+	clubs, ok := h.store.GetTableClubs(competitionID, startYear)
 	if !ok {
 		WriteError(w, http.StatusInternalServerError, "failed to load table")
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, response)
+	WriteJSON(w, http.StatusOK, clubs)
 
 }
