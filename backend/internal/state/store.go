@@ -54,3 +54,11 @@ func (s *Store) GetTable(competitionID int, startYear int) (*table.Table, bool) 
 	}
 	return table, true
 }
+
+func (s *Store) GetTableClubs(competitionID int, startYear int) ([]*table.Club, bool) {
+	table, ok := s.GetTable(competitionID, startYear)
+	if ok {
+		return table.Clubs, ok
+	}
+	return nil, ok
+}
