@@ -5,6 +5,8 @@
   --color-light: #F8FAF6;
   --color-dark: #0D0D0C;
 
+  --color-yellow-700: #949438;
+
   --color-green-900: #1B2615;
   --color-green-800: #2C3F2B;
   --color-green-750: #274425;
@@ -16,10 +18,13 @@
   --color-granit-850: #262824;
   --color-granit-800: #2D332B;
   --color-granit-600: #343732;
+  --color-granit-200: #CAD0C8;
 
   --color-red-600: #FF1D1D;
   --color-red-800: #570F0F;
 
+  
+  --color-dark-background: #1E201D;
   --color-background: var(--color-granit-600);
   --color-sections: var(--color-granit-800);
   --color-card: var(--color-granit-850);
@@ -47,6 +52,7 @@
   --font-size-heading: 48px;
   --font-size-heading2: 36px;
   --font-size-primary: 24px;
+  --font-size-primary-small: 20px;
   --font-size-secondary: 15px;
   --font-size-third: 11px;
 
@@ -84,6 +90,11 @@
 
   .text-primary {
     font-size: var(--font-size-primary);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .text-primary-small {
+    font-size: var(--font-size-primary-small);
     font-weight: var(--font-weight-regular);
   }
 

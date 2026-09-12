@@ -3,11 +3,16 @@ import { MainPage } from "./pages/main-page";
 import { CompetitionResultsPage } from "./pages/competition-results-page";
 import { CompetitionLayout } from "./layouts/competition-layout";
 import { CompetitionMatchesPage } from "./pages/competition-matches-page";
+import { CompetitionTablePage } from "./pages/competition-table-page";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: MainPage,
+  },
+  {
+    path: "/:competitionID/:startYear/tabela",
+    Component: CompetitionTablePage,
   },
   {
     path: "/:competitionID/:startYear",
@@ -22,15 +27,7 @@ export const router = createBrowserRouter([
         Component: CompetitionMatchesPage,
       },
       {
-        path: "tabela",
-        Component: CompetitionResultsPage,
-      },
-      {
         path: "strzelcy",
-        Component: CompetitionResultsPage,
-      },
-      {
-        path: "asystenci",
         Component: CompetitionResultsPage,
       },
     ],
