@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
         Component: CompetitionMatchesPage,
       },
       {
-        path: routes.matches,
+        path: routes.goalScorers,
         Component: CompetitionGoalScorersPage,
       },
     ],
