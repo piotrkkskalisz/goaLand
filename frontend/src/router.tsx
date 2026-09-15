@@ -4,6 +4,8 @@ import { CompetitionResultsPage } from "./pages/competition-results-page";
 import { CompetitionLayout } from "./layouts/competition-layout";
 import { CompetitionMatchesPage } from "./pages/competition-matches-page";
 import { CompetitionTablePage } from "./pages/competition-table-page";
+import { CompetitionGoalScorersPage } from "./pages/competition-goal-scorers-page";
+import { basePath, routePath, routes } from "./config/routes";
 
 export const router = createBrowserRouter([
   {
@@ -11,24 +13,24 @@ export const router = createBrowserRouter([
     Component: MainPage,
   },
   {
-    path: "/:competitionID/:startYear/tabela",
+    path: routePath(routes.table),
     Component: CompetitionTablePage,
   },
   {
-    path: "/:competitionID/:startYear",
+    path: basePath,
     Component: CompetitionLayout,
     children: [
-      {
-        path: "wyniki",
+      { 
+        path: routes.results,
         Component: CompetitionResultsPage,
       },
       {
-        path: "mecze",
+        path: routes.matches,
         Component: CompetitionMatchesPage,
       },
       {
-        path: "strzelcy",
-        Component: CompetitionResultsPage,
+        path: routes.goalScorers,
+        Component: CompetitionGoalScorersPage,
       },
     ],
   },
