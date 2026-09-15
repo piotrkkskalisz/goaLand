@@ -18,9 +18,14 @@ type CompetitionEdition struct {
 	Status    string `json:"status"`
 }
 
-type GoalScorer struct {
+type GoalScorerResponse struct {
+	PlayerID   int    `json:"playerID"`
+	PlayerName string `json:"playerName"`
+	TeamName   string `json:"teamName"`
+
 	Position int `json:"position"`
 	Goals    int `json:"goals"`
+	Assists  int `json:"assists"`
 }
 
 func createCompetitionEdition(competition database.Competition, edition database.Edition) CompetitionEdition {
@@ -58,7 +63,17 @@ func GetCompetitionEdition(competitions []database.Competition) []CompetitionEdi
 	return response
 }
 
-func GetEditionGoalScorers(players []database.SeasonPlayer) []GoalScorer {
+func createGoalScorerResponse(player database.SeasonPlayer, position int) GoalScorerResponse {
+	return GoalScorerResponse{
+		PlayerID:   player.PlayerID,
+		PlayerName: player.Player.Name,
+		TeamName:   player.Team.FullName,
+		Position:   position,
+		Goals:      *player.Goals,
+		Assists:    utils.IntOrZero(player.Assists),
+	}
+}
+func GetEditionGoalScorers(players []database.SeasonPlayer) []GoalScorerResponse {
 	if len(players) == 0 {
 		return nil
 	}
@@ -70,22 +85,17 @@ func GetEditionGoalScorers(players []database.SeasonPlayer) []GoalScorer {
 		return cmp.Compare(a.PlayerID, b.PlayerID)
 	})
 
-	var goalScorers []GoalScorer
+	var goalScorers []GoalScorerResponse
 	position := 1
 
-	goalScorers = append(goalScorers, GoalScorer{
-		Position: position,
-		Goals:    *players[0].Goals,
-	})
+	goalScorers = append(goalScorers, createGoalScorerResponse(players[0], position))
 
 	for i := range len(players) - 1 {
 		if *players[i].Goals != *players[i+1].Goals {
 			position += 1
 		}
-		goalScorers = append(goalScorers, GoalScorer{
-			Position: position,
-			Goals:    *players[i+1].Goals,
-		})
+		goalScorers = append(goalScorers, createGoalScorerResponse(players[i+1], position))
+
 	}
 
 	return goalScorers
