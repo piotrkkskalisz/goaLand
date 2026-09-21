@@ -44,3 +44,7 @@ func (h *Handler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("Ok"))
 }
+
+func BadRequest(w http.ResponseWriter) {
+	WriteError(w, http.StatusBadRequest, "bad request")
+}
