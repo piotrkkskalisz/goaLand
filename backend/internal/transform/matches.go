@@ -121,3 +121,13 @@ func GroupByRounds(matches []database.Match) []RoundMatchesResponse {
 
 	return groupedMatches
 }
+
+func FiltTeamMatches(matches []database.Match, clubID int) []MatchResponse {
+	response := make([]MatchResponse, 0, len(matches))
+	for _, match := range matches {
+		if match.HomeTeamID == clubID || match.AwayTeamID == clubID {
+			response = append(response, createMatchResponse(match))
+		}
+	}
+	return response
+}
