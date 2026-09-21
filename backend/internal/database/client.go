@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	PreloadArea     = "Area"
-	PreloadEditions = "Editions"
-	PreloadMatches  = "Matches"
+	PreloadArea         = "Area"
+	PreloadEditions     = "Editions"
+	PreloadMatches      = "Matches"
+	PreloadCompetitions = "Competition"
+	PreloadPlayer       = "Player"
 )
 
 var preloadTeams = []string{"HomeTeam", "AwayTeam"}
@@ -54,6 +56,15 @@ func (c *Client) Save(ctx context.Context, data any) error {
 		Clauses(clause.OnConflict{UpdateAll: true}).
 		Create(data).
 		Error
+}
+
+func (c *Client) SaveAndCheck(ctx context.Context, data any) (bool, error) {
+	result := c.db.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{UpdateAll: true}).
+		Create(data)
+
+	return result.RowsAffected > 0, result.Error
 }
 
 func (c *Client) buildQuery(ctx context.Context, preloads []string) *gorm.DB {
