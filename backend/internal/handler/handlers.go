@@ -130,15 +130,17 @@ func (h *Handler) GetClubPlayers(w http.ResponseWriter, r *http.Request) {
 
 	var players []database.SeasonPlayer
 	if err := h.db.List(ctx, &players, database.Filter{
-		"competition_id": competitionID,
-		"start_year":     startYear,
-		"team_id":        teamID,
-	}, "Player"); err != nil {
+		"competition_id":    competitionID,
+		"start_season_year": startYear,
+		"team_id":           teamID,
+	}, database.PreloadPlayer, "Player.NationalityArea"); err != nil {
 		WriteError(w, http.StatusInternalServerError, "failed to load club players")
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, players)
+	playersResponse := transform.GroupByPositions(players)
+
+	WriteJSON(w, http.StatusOK, playersResponse)
 }
 
 func (h *Handler) GetTeamInformation(w http.ResponseWriter, r *http.Request) {
@@ -205,7 +207,56 @@ func (h *Handler) GetEditionTable(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, http.StatusInternalServerError, "failed to load table")
 		return
 	}
+	response := transform.GetFullInformationClubs(clubs, competitionID)
 
-	WriteJSON(w, http.StatusOK, clubs)
+	WriteJSON(w, http.StatusOK, response)
+}
+
+func (h *Handler) GetClubTable(w http.ResponseWriter, r *http.Request) {
+	clubID, competitionID, startYear, err := clubparams(r)
+	if err != nil {
+		WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	clubs, ok := h.store.GetTableClubs(competitionID, startYear)
+	if !ok {
+		WriteError(w, http.StatusInternalServerError, "failed to load table")
+		return
+	}
+	response := transform.GetMiniTableForClub(clubs, competitionID, clubID)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+
+func (h *Handler) getClubMatches(w http.ResponseWriter, r *http.Request,
+	getMatches func(
+		ctx context.Context, competitionID int, startYear int,
+	) ([]database.Match, error)) {
+	ctx := r.Context()
+
+	clubID, competitionID, startYear, err := clubparams(r)
+	if err != nil {
+		WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	matches, err := getMatches(ctx, competitionID, startYear)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to load matches")
+		return
+	}
+
+	teamMatchesResponse := transform.FiltTeamMatches(matches, clubID)
+	WriteJSON(w, http.StatusOK, teamMatchesResponse)
+}
+
+func (h *Handler) GetClubMatches(w http.ResponseWriter, r *http.Request) {
+	h.getClubMatches(w, r, h.db.GetEditionMatches)
+
+}
+
+func (h *Handler) GetClubResults(w http.ResponseWriter, r *http.Request) {
+	h.getClubMatches(w, r, h.db.GetEditionResult)
 
 }
