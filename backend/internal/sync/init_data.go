@@ -5,6 +5,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/utils"
 	"context"
+	"errors"
 	"fmt"
 	"maps"
 	"time"
@@ -30,14 +31,14 @@ func (s *Sync) InitializeData(ctx context.Context, targets SeasonTargets) error 
 	}
 
 	for _, target := range targets {
-		if err := s.addSeason(ctx, now, target); err != nil {
+		if err := s.AddSeason(ctx, now, target); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (s *Sync) addSeason(ctx context.Context, now time.Time, target SeasonTarget) error {
+func (s *Sync) AddSeason(ctx context.Context, now time.Time, target SeasonTarget) error {
 	competitionID, ok := s.seasons.CompetitionID(target.CompetitionCode)
 	if !ok {
 		var err error
@@ -64,7 +65,7 @@ func (s *Sync) addSeason(ctx context.Context, now time.Time, target SeasonTarget
 		return err
 	}
 
-	if err := s.initMatches(ctx, season); err != nil {
+	if _, err := s.initMatches(ctx, season); err != nil {
 		return err
 	}
 
@@ -72,6 +73,36 @@ func (s *Sync) addSeason(ctx context.Context, now time.Time, target SeasonTarget
 		return err
 	}
 	return nil
+}
+
+func (s *Sync) TrackCompetitions(trackedCompetitionCodes []string) error {
+
+	expressions := createExpression(len(trackedCompetitionCodes))
+	for i, competitionCode := range trackedCompetitionCodes {
+		if err := s.addTrackedCompetition(expressions[i], competitionCode); err != nil {
+			return err
+		}
+	}
+
+	s.cron.Start()
+	return nil
+}
+
+func (s *Sync) addTrackedCompetition(expression string, competitionCode string,
+) error {
+
+	target := SeasonTarget{
+		CompetitionCode: competitionCode,
+		StartYear:       CurrentSeasonStartYear(time.Now()),
+	}
+
+	job := &SeasonJob{
+		season: target,
+		sync:   s,
+	}
+
+	_, err := s.cron.AddJob(expression, job)
+	return err
 }
 
 func (s *Sync) initAreas(ctx context.Context) error {
@@ -90,10 +121,20 @@ func (s *Sync) initAreas(ctx context.Context) error {
 			IsCountry: area.ParentArea != nil && *area.ParentArea != "World",
 		})
 		s.areasByName[area.Name] = area.ID
+
+		if area.CountryCode != "" {
+			s.areasByName[area.CountryCode] = area.ID
+		} else {
+			return errors.New("Found empty code")
+		}
 	}
 
-	return s.databaseClient.Save(ctx, dbAreas)
+	if err := s.databaseClient.Save(ctx, dbAreas); err != nil {
+		return err
+	}
+	return s.databaseClient.Save(ctx, &unknownArea)
 }
+
 func (s *Sync) initCompetition(ctx context.Context, code string) (int, error) {
 	apiCompetition, err := s.apiClient.FetchCompetition(code)
 	if err != nil {
@@ -167,19 +208,20 @@ func (s *Sync) initEdition(ctx context.Context, season Season) error {
 }
 
 func (s *Sync) initPlayers(ctx context.Context, apiTeams []api.Team, season Season) error {
-	dbPlayers := make([]database.Player, 0, 0)
-	dbSeasonPlayers := make([]database.SeasonPlayer, 0, 0)
+	dbPlayers := make([]database.Player, 0)
+	dbSeasonPlayers := make([]database.SeasonPlayer, 0)
 
 	for _, team := range apiTeams {
 		for _, player := range team.Players {
-			if _, exist := s.areasByName[player.Nationality]; !exist {
-				return fmt.Errorf("Not found Area %s", player.Nationality)
+			nationality, err := s.getAreaByNameWithError(player.Nationality, player.ID)
+			if err != nil {
+				return err
 			}
 
 			dbPlayers = append(dbPlayers, database.Player{
 				PlayerID:          player.ID,
 				Name:              player.Name,
-				NationalityAreaID: s.areasByName[player.Nationality],
+				NationalityAreaID: nationality,
 				Position:          player.Position,
 			})
 			dbSeasonPlayers = append(dbSeasonPlayers, database.SeasonPlayer{
@@ -229,10 +271,10 @@ func (s *Sync) initTeams(ctx context.Context, now time.Time, season Season) erro
 
 }
 
-func (s *Sync) initMatches(ctx context.Context, season Season) error {
+func (s *Sync) initMatches(ctx context.Context, season Season) (bool, error) {
 	apiMatches, err := s.apiClient.FetchMatches(season.CompetitionCode, season.StartYear)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	dbMatches := make([]database.Match, 0, len(apiMatches))
@@ -240,7 +282,7 @@ func (s *Sync) initMatches(ctx context.Context, season Season) error {
 	for _, match := range apiMatches {
 		startTime, err := time.Parse(time.RFC3339, match.UtcDate)
 		if err != nil {
-			return err
+			return false, err
 		}
 
 		dbMatches = append(dbMatches, database.Match{
@@ -264,7 +306,7 @@ func (s *Sync) initMatches(ctx context.Context, season Season) error {
 		})
 	}
 
-	return s.databaseClient.Save(ctx, dbMatches)
+	return s.databaseClient.SaveAndCheck(ctx, dbMatches)
 }
 
 func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) error {
@@ -277,16 +319,16 @@ func (s *Sync) initGoalScorers(ctx context.Context, season Season, limit int) er
 	dbSeasonPlayers := make([]database.SeasonPlayer, 0, len(apiGoalScorers))
 
 	for _, scorer := range apiGoalScorers {
-		areaID, exists := s.areasByName[scorer.Player.Nationality]
-		if !exists {
-			return fmt.Errorf("not found area %s", scorer.Player.Nationality)
+		nationality, err := s.getAreaByNameWithError(scorer.Player.Nationality, scorer.Player.ID)
+		if err != nil {
+			return err
 		}
 
 		dbPlayers = append(dbPlayers, database.Player{
 			PlayerID:          scorer.Player.ID,
 			Name:              scorer.Player.Name,
 			Position:          scorer.Player.Section,
-			NationalityAreaID: areaID,
+			NationalityAreaID: nationality,
 		})
 
 		dbSeasonPlayers = append(dbSeasonPlayers, database.SeasonPlayer{

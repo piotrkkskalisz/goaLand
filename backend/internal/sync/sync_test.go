@@ -24,7 +24,7 @@ func testSync(t *testing.T) (*gomock.Controller, *mocks.MockAPI, *mocks.MockData
 	apiMock := mocks.NewMockAPI(ctrl)
 	dbMock := mocks.NewMockDatabase(ctrl)
 
-	return ctrl, apiMock, dbMock, New(apiMock, dbMock)
+	return ctrl, apiMock, dbMock, New(apiMock, dbMock, nil)
 }
 
 func TestInitAreas(t *testing.T) {
@@ -187,7 +187,7 @@ func TestInitMatches(t *testing.T) {
 
 	dbMock.EXPECT().Save(ctx, []database.Match{expectedMatch}).Return(nil)
 
-	err := s.initMatches(ctx, Season{
+	_, err := s.initMatches(ctx, Season{
 		CompetitionID:   testutils.PremierLeagueID,
 		CompetitionCode: testutils.PremierLeagueCode,
 		StartYear:       testutils.Year,

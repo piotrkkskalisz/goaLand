@@ -4,6 +4,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/state/table"
 	"context"
+	"sync"
 )
 
 type tableKey struct {
@@ -14,25 +15,44 @@ type tableKey struct {
 type Store struct {
 	tables map[tableKey]*table.Table
 	db     *database.Client
+	mu     sync.RWMutex
 }
 
-func CreateStore(ctx context.Context, db *database.Client) (*Store, error) {
+func NewStore(ctx context.Context, db *database.Client) *Store {
+	return &Store{
+		tables: make(map[tableKey]*table.Table),
+		db:     db,
+	}
+}
+
+func (c *Store) InitTables(ctx context.Context) error {
 	var editions []database.Edition
 
-	db.List(ctx, &editions, database.Filter{})
-	tables := make(map[tableKey]*table.Table)
+	c.db.List(ctx, &editions, database.Filter{})
 
 	for _, edition := range editions {
-		table, err := table.CreateTable(ctx, db, edition.CompetitionID, edition.StartYear)
+		table, err := table.CreateTable(ctx, c.db, edition.CompetitionID, edition.StartYear)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		tables[GetKey(table)] = table
+		c.tables[GetKey(table)] = table
 	}
-	return &Store{
-		tables: tables,
-		db:     db,
-	}, nil
+	return nil
+}
+func (s *Store) RefreshTable(ctx context.Context, competitionID, startYear int) error {
+	key := tableKey{
+		competitionID: competitionID,
+		startYear:     startYear,
+	}
+	newTable, err := table.CreateTable(ctx, s.db, competitionID, startYear)
+
+	if err != nil {
+		return err
+	}
+	s.mu.Lock()
+	s.tables[key] = newTable
+	s.mu.Unlock()
+	return nil
 }
 
 func GetKey(table *table.Table) tableKey {
@@ -48,7 +68,10 @@ func (s *Store) GetTable(competitionID int, startYear int) (*table.Table, bool) 
 		startYear:     startYear,
 	}
 
+	s.mu.RLock()
 	table, exists := s.tables[key]
+	s.mu.RUnlock()
+
 	if !exists {
 		return nil, false
 	}
