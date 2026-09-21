@@ -1,8 +1,11 @@
+import { Link } from "react-router";
 import type { Club } from "../config/club";
+import { createClubPageLink } from "../config/routes";
 
 type TableClubProps = {
-  position: number;
   club: Club;
+  size?: "small" | "large";
+  isSelected?: boolean;
 };
 
 const formResult = {
@@ -11,26 +14,38 @@ const formResult = {
   loss: { label: "P", className: "bg-red-800" },
 };
 
-export function TableClub({ position, club }: TableClubProps) {
+export function TableClub({
+  club,
+  size = "large",
+  isSelected = false,
+}: TableClubProps) {
   const playedMatches = club.wins + club.draws + club.losses;
+  const isSmall = size === "small";
 
   return (
-    <tr className="border-t border-granit-200 text-center h-[50px]">
-      <td>{position}.</td>
+    <tr
+      className={`border-t border-granit-200 text-center ${
+        isSmall ? "h-[35px]" : "h-[50px]"
+      } ${isSelected ? "bg-green-750" : ""}`}
+    >
+      <td>{club.position}.</td>
       <td className="text-left">
         <span className="flex items-center gap-[8px]">
           {club.isLive && (
             <span className="h-[8px] w-[8px] rounded-full bg-live" />
           )}
-          {club.teamName}
+          <Link to={createClubPageLink(club)}>
+            {club.teamName}
+          </Link>
         </span>
       </td>
-      <td> {club.points}</td>
+      {!isSmall && <td>{club.points}</td>}
       <td>{playedMatches}</td>
-      <td>{club.wins}</td>
-      <td>{club.draws}</td>
-      <td>{club.losses}</td>
+      {!isSmall && <td>{club.wins}</td>}
+      {!isSmall && <td>{club.draws}</td>}
+      {!isSmall && <td>{club.losses}</td>}
       <td>{`${club.goalsScored}:${club.goalsConceded}`}</td>
+      {isSmall && <td>{club.points}</td>}
       <td>
         <span className="flex items-center justify-center gap-[5px]">
           {club.form.map((result, index) => {
