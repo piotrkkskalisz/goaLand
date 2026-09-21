@@ -11,6 +11,7 @@ package mocks
 
 import (
 	api "backend/internal/api"
+	database "backend/internal/database"
 	context "context"
 	reflect "reflect"
 
@@ -170,6 +171,61 @@ func (m *MockDatabase) EXPECT() *MockDatabaseMockRecorder {
 	return m.recorder
 }
 
+// ClearSeason mocks base method.
+func (m *MockDatabase) ClearSeason(ctx context.Context, competitonID, startYear int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "ClearSeason", ctx, competitonID, startYear)
+}
+
+// ClearSeason indicates an expected call of ClearSeason.
+func (mr *MockDatabaseMockRecorder) ClearSeason(ctx, competitonID, startYear any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearSeason", reflect.TypeOf((*MockDatabase)(nil).ClearSeason), ctx, competitonID, startYear)
+}
+
+// DeleteSeasonMatches mocks base method.
+func (m *MockDatabase) DeleteSeasonMatches(ctx context.Context, competitonID, startYear int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteSeasonMatches", ctx, competitonID, startYear)
+}
+
+// DeleteSeasonMatches indicates an expected call of DeleteSeasonMatches.
+func (mr *MockDatabaseMockRecorder) DeleteSeasonMatches(ctx, competitonID, startYear any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSeasonMatches", reflect.TypeOf((*MockDatabase)(nil).DeleteSeasonMatches), ctx, competitonID, startYear)
+}
+
+// DeleteSeasonPlayers mocks base method.
+func (m *MockDatabase) DeleteSeasonPlayers(ctx context.Context, competitonID, startYear int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteSeasonPlayers", ctx, competitonID, startYear)
+}
+
+// DeleteSeasonPlayers indicates an expected call of DeleteSeasonPlayers.
+func (mr *MockDatabaseMockRecorder) DeleteSeasonPlayers(ctx, competitonID, startYear any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSeasonPlayers", reflect.TypeOf((*MockDatabase)(nil).DeleteSeasonPlayers), ctx, competitonID, startYear)
+}
+
+// List mocks base method.
+func (m *MockDatabase) List(ctx context.Context, dest any, filter database.Filter, preloads ...string) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, filter}
+	for _, a := range preloads {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "List", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// List indicates an expected call of List.
+func (mr *MockDatabaseMockRecorder) List(ctx, dest, filter any, preloads ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, filter}, preloads...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockDatabase)(nil).List), varargs...)
+}
+
 // Save mocks base method.
 func (m *MockDatabase) Save(arg0 context.Context, arg1 any) error {
 	m.ctrl.T.Helper()
@@ -182,4 +238,19 @@ func (m *MockDatabase) Save(arg0 context.Context, arg1 any) error {
 func (mr *MockDatabaseMockRecorder) Save(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockDatabase)(nil).Save), arg0, arg1)
+}
+
+// SaveAndCheck mocks base method.
+func (m *MockDatabase) SaveAndCheck(arg0 context.Context, arg1 any) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveAndCheck", arg0, arg1)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveAndCheck indicates an expected call of SaveAndCheck.
+func (mr *MockDatabaseMockRecorder) SaveAndCheck(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAndCheck", reflect.TypeOf((*MockDatabase)(nil).SaveAndCheck), arg0, arg1)
 }
