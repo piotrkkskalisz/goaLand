@@ -6,41 +6,54 @@ import (
 	"backend/internal/sync"
 	"context"
 	"log"
+	"time"
 
 	"backend/internal/database"
 	"backend/internal/server"
 )
 
 const (
-	resetDatabaseOnStart = false
-	tryFetchData         = false
+	tryFetchData = false
+
+	tryTrackData = true
 )
 
+var trackedCompetitionCodes = []string{"PL", "PD", "BL1", "SA", "FL1"}
+
 func main() {
+	ctx := context.Background()
+
 	db, err := database.NewClientFromEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
+	store := state.NewStore(ctx, db)
 
-	if resetDatabaseOnStart {
+	apiClient := api.NewClientFromEnv()
+
+	worker := sync.New(apiClient, db, store)
+	if tryFetchData {
 		if err := db.ResetDatabase(); err != nil {
 			log.Fatal(err)
 		}
+		if err := fetchData(ctx, worker); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		worker.InitAreasFromDB(ctx)
 	}
 
-	if tryFetchData {
-		if err := fetchData(db); err != nil {
+	if err = store.InitTables(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	if tryTrackData {
+		if err := worker.TrackCompetitions(trackedCompetitionCodes); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	ctx := context.Background()
-	store, err := state.CreateStore(ctx, db)
-
 	server := server.NewServer(db, store)
-	if err != nil {
-		log.Fatal(store)
-	}
 
 	log.Println("Starting server on :8080")
 
@@ -49,27 +62,24 @@ func main() {
 	}
 }
 
-func fetchData(db *database.Client) error {
-	api := api.NewClientFromEnv()
-	ctx := context.Background()
-	worker := sync.New(api, db)
-	targets := []sync.SeasonTarget{{
+func fetchData(ctx context.Context, worker *sync.Sync) error {
+	now := time.Now()
+
+	oldSeasonTargets := []sync.SeasonTarget{{
 		CompetitionCode: "PL",
-		StartYear:       2026,
-	}, {
-		CompetitionCode: "PD",
-		StartYear:       2026,
-	}, {
-		CompetitionCode: "BL1",
-		StartYear:       2026,
-	}, {
-		CompetitionCode: "SA",
-		StartYear:       2026,
-	}, {
-		CompetitionCode: "FL1",
-		StartYear:       2026,
-	},
+		StartYear:       2025,
+	}}
+
+	err := worker.InitializeData(ctx, oldSeasonTargets)
+	if err != nil {
+		return err
 	}
 
-	return worker.InitializeData(ctx, targets)
+	for _, code := range trackedCompetitionCodes {
+		worker.AddSeason(ctx, now, sync.SeasonTarget{
+			CompetitionCode: code,
+			StartYear:       sync.CurrentSeasonStartYear(now),
+		})
+	}
+	return nil
 }
