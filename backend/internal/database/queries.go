@@ -127,3 +127,9 @@ func (c *Client) GetEditionGoalScorers(ctx context.Context, competitionID int, s
 
 	return goalScorers, err
 }
+
+func (c *Client) GetEditions(ctx context.Context, competitionID int, preloads ...string) ([]Edition, error) {
+	var edition []Edition
+	err := c.List(ctx, &edition, Filter{"competition_id": competitionID}, preloads...)
+	return edition, err
+}
