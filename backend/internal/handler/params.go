@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"backend/internal/sync"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 const (
@@ -15,19 +17,18 @@ const (
 	AreaIDParam        = "areaID"
 )
 
-func teamParam(r *http.Request) (int, error) {
-	teamID, err := parseInt(r, TeamIDParam)
-	if err != nil {
-		return 0, fmt.Errorf("invalid team ID")
-	}
-
-	return teamID, nil
-}
-
 func clubParam(r *http.Request) (int, error) {
 	clubID, err := parseInt(r, ClubIDParam)
 	if err != nil {
 		return 0, fmt.Errorf("invalid club ID")
+	}
+
+	return clubID, nil
+}
+func teamParam(r *http.Request) (int, error) {
+	clubID, err := parseInt(r, ClubIDParam)
+	if err != nil {
+		return 0, fmt.Errorf("invalid team ID")
 	}
 
 	return clubID, nil
@@ -60,8 +61,24 @@ func goalScorerParam(r *http.Request) (int, error) {
 	return goalScorerID, nil
 }
 
-func areaParam(r *http.Request) (int, error) {
-	areaID, err := parseInt(r, AreaIDParam)
+func clubparams(r *http.Request) (clubID int, competitionID int, startYear int, err error) {
+	competitionID, err = competitionParam(r)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	clubID, err = clubParam(r)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	startYear = sync.CurrentSeasonStartYear(time.Now())
+
+	return clubID, competitionID, startYear, nil
+}
+
+func areaParam(r *http.Request) (areaID int, err error) {
+	areaID, err = parseInt(r, AreaIDParam)
 	if err != nil {
 		return 0, fmt.Errorf("invalid area ID")
 	}
