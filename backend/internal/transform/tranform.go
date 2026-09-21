@@ -101,3 +101,19 @@ func GetEditionGoalScorers(players []database.SeasonPlayer) []GoalScorerResponse
 	return goalScorers
 
 }
+
+type EditionResponse struct {
+	CompetitionID int `json:"competitionId"`
+	StartYear     int `json:"startYear"`
+}
+
+func GetEditions(edition []database.Edition) []EditionResponse {
+	var response []EditionResponse
+	for _, e := range edition {
+		response = append(response, EditionResponse{
+			CompetitionID: e.CompetitionID,
+			StartYear:     e.StartYear,
+		})
+	}
+	return response
+}
