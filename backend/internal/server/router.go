@@ -42,5 +42,9 @@ func NewRouter(db *database.Client, store *state.Store) http.Handler {
 	r.Get("/competitions/{competitionID}/clubs/{clubID}/players", handler.GetClubPlayers)
 	r.Get("/competitions/{competitionID}/clubs/{clubID}/information", handler.GetTeamInformation)
 
+	r.Get("/competitions/{competitionID}/clubs/{clubID}/matches", handler.GetClubMatches)
+	r.Get("/competitions/{competitionID}/clubs/{clubID}/results", handler.GetClubResults)
+	r.Get("/competitions/{competitionID}/clubs/{clubID}/table", handler.GetClubTable)
+
 	return r
 }
