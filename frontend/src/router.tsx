@@ -5,7 +5,8 @@ import { CompetitionLayout } from "./layouts/competition-layout";
 import { CompetitionMatchesPage } from "./pages/competition-matches-page";
 import { CompetitionTablePage } from "./pages/competition-table-page";
 import { CompetitionGoalScorersPage } from "./pages/competition-goal-scorers-page";
-import { basePath, routePath, routes } from "./config/routes";
+import { basePath, clubaPagePath, routePath, routes } from "./config/routes";
+import { ClubPage } from "./pages/club-page";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ export const router = createBrowserRouter([
   {
     path: routePath(routes.table),
     Component: CompetitionTablePage,
+  },
+  {
+    path: clubaPagePath,
+    Component: ClubPage,
   },
   {
     path: basePath,
