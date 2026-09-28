@@ -33,6 +33,7 @@ type Team struct {
 	ShortName string `gorm:"not null"`
 	Code      string `gorm:"not null"`
 	Colors    string
+	CrestUrl  string `gorm:"not null"`
 
 	Stadium string `gorm:"not null"`
 	AreaID  int    `gorm:"not null"`
