@@ -45,6 +45,7 @@ func TestInitAreas(t *testing.T) {
 		poland,
 		england,
 	}).Return(nil)
+	dbMock.EXPECT().Save(ctx, &unknownArea).Return(nil)
 
 	require.NoError(t, s.initAreas(ctx))
 
@@ -185,7 +186,7 @@ func TestInitMatches(t *testing.T) {
 
 	apiMock.EXPECT().FetchMatches(testutils.PremierLeagueCode, testutils.Year).Return([]api.Match{apiMatch}, nil)
 
-	dbMock.EXPECT().Save(ctx, []database.Match{expectedMatch}).Return(nil)
+	dbMock.EXPECT().SaveAndCheck(ctx, []database.Match{expectedMatch}).Return(true, nil)
 
 	_, err := s.initMatches(ctx, Season{
 		CompetitionID:   testutils.PremierLeagueID,
