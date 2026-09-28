@@ -29,9 +29,13 @@ func NewRouter(db *database.Client, store *state.Store) http.Handler {
 	//example simply endpoint
 	r.Get("/health", handler.GetHealth)
 
-	// Endpoints
+	// Endpoints pdowjny MECZE klubwoe i druzynowe
 	r.Get("/teams/{teamID}/matches", handler.GetTeamsMatches)
-	r.Get("/competitions", handler.GetCompetitionEdition)
+
+	r.Get("/competitions", handler.GetActiveEdition)
+	r.Get("/competitions/{competitionID}/editions", handler.GetCompetitionEditions)
+	r.Get("/competitions/{competitionID}/{startYear}/data", handler.GetCompetitionData)
+
 	r.Get("/competitions/{competitionID}/{startYear}/matches", handler.GetEditionMatches)
 	r.Get("/competitions/{competitionID}/{startYear}/goal-scorers", handler.GetEditionGoalScorers)
 	r.Get("/competitions/{competitionID}/{startYear}/results", handler.GetEditionResults)

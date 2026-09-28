@@ -161,7 +161,7 @@ func (h *Handler) GetTeamInformation(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, team)
 }
 
-func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetActiveEdition(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var competitions []database.Competition
@@ -170,7 +170,44 @@ func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response := transform.GetCompetitionEdition(competitions)
+	response := transform.GetActiveEditions(competitions)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+func (h *Handler) GetCompetitionData(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	competitionID, startYear, err := editionParams(r)
+	if err != nil {
+		BadRequest(w)
+		return
+	}
+	edition, err := h.db.GetEdition(ctx, competitionID, startYear, database.PreloadCompetition)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to load editions")
+		return
+	}
+
+	response := transform.CreateEditionResponse(edition.Competition, edition)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+func (h *Handler) GetCompetitionEditions(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	competitionID, err := competitionParam(r)
+	if err != nil {
+		BadRequest(w)
+		return
+	}
+
+	editions, err := h.db.GetEditions(ctx, competitionID, database.PreloadCompetition)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to load editions")
+		return
+	}
+
+	response := transform.GetEditions(editions)
 
 	WriteJSON(w, http.StatusOK, response)
 }
@@ -258,24 +295,4 @@ func (h *Handler) GetClubMatches(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetClubResults(w http.ResponseWriter, r *http.Request) {
 	h.getClubMatches(w, r, h.db.GetEditionResult)
-}
-
-func (h *Handler) GetEditions(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	competitionID, err := competitionParam(r)
-	if err != nil {
-		BadRequest(w)
-		return
-	}
-
-	editions, err := h.db.GetEditions(ctx, competitionID)
-	if err != nil {
-		WriteError(w, http.StatusInternalServerError, "failed to load editions")
-		return
-	}
-
-	response := transform.GetEditions(editions)
-
-	WriteJSON(w, http.StatusOK, response)
 }
