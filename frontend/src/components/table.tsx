@@ -1,13 +1,14 @@
-import type { Club } from "../config/club";
+import type { ClubStats } from "../config/club";
 import { TableClub } from "./table-club";
 
 type TableProps = {
-  clubs: Club[];
+  clubs: ClubStats[];
   size?: "small" | "large";
   selectedClub?: number;
+  isCurrent?: boolean;
 };
 
-export function Table({ clubs, size = "large", selectedClub }: TableProps) {
+export function Table({ clubs, size = "large", selectedClub, isCurrent = true }: TableProps) {
   const isSmall = size === "small";
 
   return (
@@ -59,10 +60,11 @@ export function Table({ clubs, size = "large", selectedClub }: TableProps) {
       <tbody>
         {clubs.map((club) => (
           <TableClub
-            key={club.teamId}
+            key={club.id}
             club={club}
             size={size}
-            isSelected={club.teamId === selectedClub}
+            isSelected={club.id === selectedClub}
+            isCurrent={isCurrent}
           />
         ))}
       </tbody>
