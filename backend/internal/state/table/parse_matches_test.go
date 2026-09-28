@@ -100,6 +100,7 @@ func TestFullMatch(t *testing.T) {
 		{
 			TeamID:        manCity.TeamID,
 			TeamName:      manCity.FullName,
+			TeamCode:      manCity.Code,
 			Points:        7,
 			Wins:          2,
 			Draws:         1,
@@ -110,6 +111,7 @@ func TestFullMatch(t *testing.T) {
 		}, {
 			TeamID:        arsenal.TeamID,
 			TeamName:      arsenal.FullName,
+			TeamCode:      arsenal.Code,
 			Points:        7,
 			Wins:          2,
 			Draws:         1,
@@ -120,6 +122,7 @@ func TestFullMatch(t *testing.T) {
 		}, {
 			TeamID:        chelsea.TeamID,
 			TeamName:      chelsea.FullName,
+			TeamCode:      chelsea.Code,
 			Points:        2,
 			Wins:          0,
 			Draws:         2,
@@ -184,6 +187,7 @@ func TestPartMatch(t *testing.T) {
 		{
 			TeamID:        manCity.TeamID,
 			TeamName:      manCity.FullName,
+			TeamCode:      manCity.Code,
 			Points:        3,
 			Wins:          1,
 			Losses:        1,
@@ -195,6 +199,7 @@ func TestPartMatch(t *testing.T) {
 		{
 			TeamID:      arsenal.TeamID,
 			TeamName:    arsenal.FullName,
+			TeamCode:    arsenal.Code,
 			Points:      3,
 			Wins:        1,
 			GoalsScored: 1,
@@ -203,6 +208,7 @@ func TestPartMatch(t *testing.T) {
 		{
 			TeamID:        chelsea.TeamID,
 			TeamName:      chelsea.FullName,
+			TeamCode:      chelsea.Code,
 			Points:        0,
 			Losses:        1,
 			GoalsConceded: 4,
