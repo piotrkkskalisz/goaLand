@@ -18,6 +18,7 @@ export function routePath(route: Route) {
 
 export const clubaPagePath = "/competitions/:competition/clubs/:clubID/:club_name"
 
-export function createClubPageLink(club: Club){
-  return `/competitions/${club.competitionID}/clubs/${club.teamId}/${club.teamName}"`
+
+export function createClubPageLink(competitionID: number, club: Club){
+  return `/competitions/${competitionID}/clubs/${club.id}/${club.name}`;
 }
