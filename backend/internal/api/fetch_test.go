@@ -88,6 +88,7 @@ func TestFetchTeams(t *testing.T) {
 		require.NotEmpty(t, team.TLA)
 		require.NotEmpty(t, team.ClubColors)
 		require.NotEmpty(t, team.Venue)
+		require.NotEmpty(t, team.CrestUrl)
 	}
 }
 

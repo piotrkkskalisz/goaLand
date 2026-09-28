@@ -3,6 +3,7 @@ package testutils
 import (
 	"backend/internal/database"
 	"backend/internal/utils"
+	"fmt"
 	"time"
 )
 
@@ -87,6 +88,7 @@ func Arsenal() database.Team {
 		FullName:  "Arsenal FC",
 		ShortName: "Arsenal",
 		Code:      "ARS",
+		CrestUrl:  fmt.Sprintf("https://crests.football-data.org/%d.png", ArsenalID),
 		Colors:    "Red / White",
 		AreaID:    EnglandAreaID,
 		Area:      England(),
@@ -100,6 +102,7 @@ func Chelsea() database.Team {
 		FullName:  "Chelsea FC",
 		ShortName: "Chelsea",
 		Code:      "CHE",
+		CrestUrl:  fmt.Sprintf("https://crests.football-data.org/%d.png", ChelseaId),
 		Colors:    "Blue / White",
 		AreaID:    EnglandAreaID,
 		Area:      England(),
@@ -113,6 +116,7 @@ func ManCity() database.Team {
 		FullName:  "Manchester City FC",
 		ShortName: "Man City",
 		Code:      "MCI",
+		CrestUrl:  fmt.Sprintf("https://crests.football-data.org/%d.png", ManCityID),
 		Colors:    "Blue",
 		AreaID:    EnglandAreaID,
 		Area:      England(),
@@ -125,6 +129,7 @@ func Liverpool() database.Team {
 		FullName:  "Liverpool FC",
 		ShortName: "Liverpool",
 		Code:      "LIV",
+		CrestUrl:  fmt.Sprintf("https://crests.football-data.org/%d.png", LiverpoolID),
 		Colors:    "Red",
 		AreaID:    EnglandAreaID,
 		Area:      England(),
