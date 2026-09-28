@@ -1,10 +1,13 @@
+import { Link } from "react-router/internal/react-server-client";
 import type { MatchData } from "../config/matches";
+import { createClubPageLink } from "../config/routes";
 
 type MatchProps = MatchData & {
   size?: "small" | "large";
+  isCurrent?: boolean;
 };
 
-export function Match({ size = "large", ...props }: MatchProps) {
+export function Match({ size = "large", isCurrent = true, ...props }: MatchProps) {
   const isLive = props.status === "live";
   const score =
     props.status === "scheduled"
@@ -52,9 +55,13 @@ export function Match({ size = "large", ...props }: MatchProps) {
             isSmall ? "h-[27px] w-[27px]" : "h-[40px] w-[40px]"
           }`}
         />
-        <span className={isSmall ? "text-secondary" : "text-primary"}>
-          {props.homeTeam}
-        </span>
+        {isCurrent ? (
+          <Link to={createClubPageLink(props.competitionID, props.homeTeam)} className={isSmall ? "text-secondary" : "text-primary"}>
+            {props.homeTeam.name}
+          </Link>
+        ) : (
+          <span className={isSmall ? "text-secondary" : "text-primary"}>{props.homeTeam.name}</span>
+        )}
       </div>
 
       <div
@@ -70,9 +77,18 @@ export function Match({ size = "large", ...props }: MatchProps) {
           isSmall ? "gap-[7px] px-[7px]" : "gap-[10px] px-[10px]"
         }`}
       >
-        <span className={isSmall ? "text-secondary" : "text-primary"}>
-          {props.awayTeam}
-        </span>
+        {isCurrent ? (
+          <Link
+            to={createClubPageLink(props.competitionID, props.awayTeam)}
+            className={`text-right ${isSmall ? "text-secondary" : "text-primary"}`}
+          >
+            {props.awayTeam.name}
+          </Link>
+        ) : (
+          <span className={`text-right ${isSmall ? "text-secondary" : "text-primary"}`}>
+            {props.awayTeam.name}
+          </span>
+        )}
         <span
           className={`bg-light ${
             isSmall ? "h-[27px] w-[27px]" : "h-[40px] w-[40px]"
