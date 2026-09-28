@@ -4,6 +4,7 @@ export type Club = {
   id: number;
   name: string;
   code: string,
+  crestUrl: string;
 }
 export type ClubStats = Club & {
   position: number;

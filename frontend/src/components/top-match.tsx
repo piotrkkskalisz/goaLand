@@ -3,6 +3,7 @@ import type { MatchData } from "../config/matches";
 import { createClubPageLink } from "../config/routes";
 import type { Club } from "../config/club";
 import { Link } from "react-router";
+import { ClubLogo } from "./club-logo";
 
 type winner = "team1" | "team2";
 
@@ -20,15 +21,20 @@ type TopMatchProps = {
 function TopMatch({competitionID, homeTeam, awayTeam, homeTeamString, awayTeamString, 
   winner, separator, children}: TopMatchProps) {
   return (
-    <div className="h-[48px] w-[128px] shrink-0 flex flex-col items-center -space-y-[2px]">
-      <div className="text-secondary relative flex w-[128px]  h-[20px] items-center justify-center rounded-[5px]  bg-sections">
-        <Link to={createClubPageLink(competitionID, homeTeam)} className={winner === "team1" ? "font-bold" : undefined}>
-          {homeTeamString}
-        </Link>
-        {separator}
-        <Link to={createClubPageLink(competitionID, awayTeam)}className={winner === "team2" ? "font-bold" : undefined}>
-          {awayTeamString}
-        </Link>
+    <div className="h-[56px] w-[160px] shrink-0 flex flex-col items-center -space-y-[2px]">
+      <div className="text-secondary relative flex w-full  h-[28px] items-center justify-center rounded-[5px]  bg-sections gap-[3px]">
+        <ClubLogo url={homeTeam.crestUrl} size={20} />
+          <div className="  flex items-center justify-center">
+            <Link to={createClubPageLink(competitionID, homeTeam)} className={winner === "team1" ? "font-bold" : undefined}>
+              {homeTeamString}
+            </Link>
+            {separator}
+            <Link to={createClubPageLink(competitionID, awayTeam)}className={winner === "team2" ? "font-bold" : undefined}>
+              {awayTeamString}
+            </Link>
+          </div>
+          <ClubLogo url={awayTeam.crestUrl} size={20} />
+
       </div>
       <div className="flex h-[30px] w-[80px] items-center justify-center leading-[13px] bg-sections [clip-path:polygon(0_0,100%_0,87.5%_100%,12.5%_100%)]">
         <div className="text-third text-center">{children}</div>

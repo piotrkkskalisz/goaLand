@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { ClubStats } from "../config/club";
 import { createClubPageLink } from "../config/routes";
+import { ClubLogo } from "./club-logo";
 
 type TableClubProps = {
   club: ClubStats;
@@ -32,10 +33,16 @@ export function TableClub({
     >
       <td>{club.position}.</td>
       <td className="text-left">
-        <span className="flex items-center gap-[8px]">
+        <div className="flex items-center gap-[8px]">
           {club.isLive && (
             <span className="h-[8px] w-[8px] rounded-full bg-live" />
           )}
+          {isSmall ? (
+            <ClubLogo url={club.crestUrl} size={24} />
+          ) : (
+            <ClubLogo url={club.crestUrl} size={32} />
+          )}
+          
           {isCurrent ? (
             <Link to={createClubPageLink(club.competitionID, club)}>
               {club.name}
@@ -43,7 +50,7 @@ export function TableClub({
           ) : (
             <span>{club.name}</span>
           )}
-        </span>
+        </div>
       </td>
       {!isSmall && <td>{club.points}</td>}
       <td>{playedMatches}</td>

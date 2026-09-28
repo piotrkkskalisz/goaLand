@@ -8,6 +8,7 @@ import { TeamPlayersTable } from "../components/team-players-table";
 import type { ClubStats } from "../config/club";
 import type { MatchData } from "../config/matches";
 import type { PlayersOnPosition } from "../config/team-players";
+import { ClubLogo } from "../components/club-logo";
 
 type MatchesView = "matches" | "results";
 type ClubView = "table" | "players";
@@ -97,16 +98,17 @@ export function ClubPage() {
     return <div>Nieprawidłowy klub</div>;
   }
 
-  const clubName =
-    clubs?.find((club) => club.id === selectedClub)?.name ??
-    `Klub ${selectedClub}`;
+  const selectedClubData = clubs?.find((club) => club.id === selectedClub);
+  const clubName = selectedClubData?.name ?? `Klub ${selectedClub}`;
+    
   const displayedMatches = matchesView === "matches" ? matches : results;
 
   return (
     <main className="min-h-screen bg-dark-background px-[50px] pb-[50px] pt-[25px]">
       <Header />
 
-      <h2 className="mx-auto my-[40px] w-fit rounded-lg bg-card px-[50px] py-[5px] text-heading">
+      <h2 className="mx-auto my-[40px] flex w-fit items-center gap-[10px] rounded-lg bg-card px-[50px] py-[5px] text-heading">
+        <ClubLogo url={selectedClubData?.crestUrl} size={64} />
         {clubName}
       </h2>
 

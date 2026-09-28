@@ -1,6 +1,7 @@
 import { Link } from "react-router/internal/react-server-client";
 import type { MatchData } from "../config/matches";
 import { createClubPageLink } from "../config/routes";
+import { ClubLogo } from "./club-logo";
 
 type MatchProps = MatchData & {
   size?: "small" | "large";
@@ -51,10 +52,12 @@ export function Match({ size = "large", isCurrent = true, ...props }: MatchProps
         }`}
       >
         <span
-          className={`bg-light ${
+          className={`flex items-center justify-center ${
             isSmall ? "h-[27px] w-[27px]" : "h-[40px] w-[40px]"
           }`}
-        />
+        >
+        <ClubLogo url={props.homeTeam.crestUrl}/>
+        </span>
         {isCurrent ? (
           <Link to={createClubPageLink(props.competitionID, props.homeTeam)} className={isSmall ? "text-secondary" : "text-primary"}>
             {props.homeTeam.name}
@@ -90,10 +93,12 @@ export function Match({ size = "large", isCurrent = true, ...props }: MatchProps
           </span>
         )}
         <span
-          className={`bg-light ${
+          className={`flex items-center justify-center ${
             isSmall ? "h-[27px] w-[27px]" : "h-[40px] w-[40px]"
           }`}
-        />
+        >
+          <ClubLogo url={props.awayTeam.crestUrl}/>
+        </span>
       </div>
     </div>
   );
