@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	PreloadArea         = "Area"
-	PreloadEditions     = "Editions"
-	PreloadMatches      = "Matches"
-	PreloadCompetitions = "Competition"
-	PreloadPlayer       = "Player"
+	PreloadArea        = "Area"
+	PreloadEditions    = "Editions"
+	PreloadMatches     = "Matches"
+	PreloadCompetition = "Competition"
+	PreloadPlayer      = "Player"
 )
 
 var preloadTeams = []string{"HomeTeam", "AwayTeam"}

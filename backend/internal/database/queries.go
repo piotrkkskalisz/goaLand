@@ -133,3 +133,12 @@ func (c *Client) GetEditions(ctx context.Context, competitionID int, preloads ..
 	err := c.List(ctx, &edition, Filter{"competition_id": competitionID}, preloads...)
 	return edition, err
 }
+
+func (c *Client) GetEdition(ctx context.Context, competitionID int, startYear int, preloads ...string) (Edition, error) {
+	var edition Edition
+	err := c.Get(ctx, &edition, Filter{
+		"competition_id": competitionID,
+		"start_year":     startYear,
+	}, preloads...)
+	return edition, err
+}
