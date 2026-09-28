@@ -5,7 +5,7 @@ import { Header } from "../components/header";
 import { Match } from "../components/match";
 import { Table } from "../components/table";
 import { TeamPlayersTable } from "../components/team-players-table";
-import type { Club } from "../config/club";
+import type { ClubStats } from "../config/club";
 import type { MatchData } from "../config/matches";
 import type { PlayersOnPosition } from "../config/team-players";
 
@@ -42,14 +42,20 @@ export function ClubPage() {
   const [clubView, setClubView] = useState<ClubView>("table");
   const [matches, setMatches] = useState<MatchData[] | null>(null);
   const [results, setResults] = useState<MatchData[] | null>(null);
-  const [clubs, setClubs] = useState<Club[] | null>(null);
+  const [clubs, setClubs] = useState<ClubStats[] | null>(null);
   const [players, setPlayers] = useState<PlayersOnPosition[] | null>(null);
 
   
   const validParams = Boolean(competition) && Number.isInteger(selectedClub);
   const clubPath = `/competitions/${competition}/clubs/${selectedClub}`;
 
-  
+  useEffect(() => {
+    setMatches(null);
+    setResults(null);
+    setClubs(null);
+    setPlayers(null);
+  }, [clubPath]);
+
   useEffect(() => {
     if (!validParams) {
       return;
@@ -72,7 +78,7 @@ export function ClubPage() {
       return;
     }
 
-    get<Club[]>(`${clubPath}/table`)
+    get<ClubStats[]>(`${clubPath}/table`)
       .then(setClubs)
       .catch(console.error);
   }, [clubPath, clubs, validParams]);
@@ -92,7 +98,7 @@ export function ClubPage() {
   }
 
   const clubName =
-    clubs?.find((club) => club.teamId === selectedClub)?.teamName ??
+    clubs?.find((club) => club.id === selectedClub)?.name ??
     `Klub ${selectedClub}`;
   const displayedMatches = matchesView === "matches" ? matches : results;
 
