@@ -1,16 +1,38 @@
+import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router";
+import { GetCompetitionEditions } from "../api/edition";
 import { CompetitionTitle } from "../components/competition-title";
 import { Header } from "../components/header";
 import { NavigatorButtonList } from "../components/navigator-button-list";
-import { getEditionFromStrings } from "../config/editions";
-
+import type { Edition } from "../config/editions";
 
 export function CompetitionLayout() {
-  const { competitionID, startYear } = useParams();  
-  const edition = getEditionFromStrings(competitionID, startYear)
+  const { competitionID, startYear } = useParams();
+  const [edition, setEdition] = useState<Edition>();
+
+  useEffect(() => {
+    const competitionIdNumber = Number(competitionID);
+    const startYearNumber = Number(startYear);
+
+    if (!Number.isFinite(competitionIdNumber) || !Number.isFinite(startYearNumber)) {
+      setEdition(undefined);
+      return;
+    }
+
+    setEdition(undefined);
+    GetCompetitionEditions(competitionIdNumber)
+      .then((editions) => {
+        setEdition(
+          editions.find((item) => item.startYear === startYearNumber),
+        );
+      })
+      .catch(() => {
+        setEdition(undefined);
+      });
+  }, [competitionID, startYear]);
 
   if (!edition) {
-    return <div>Nie znaleziono rozgrywek</div>;
+    return <div>Nie znaleziono rozgrywek lub trwa ładowanie</div>;
   }
   
   return (

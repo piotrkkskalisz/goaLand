@@ -1,24 +1,39 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { GetCompetitionData } from "../api/edition";
 import { getTable } from "../api/table";
 import { CompetitionTitle } from "../components/competition-title";
 import { Header } from "../components/header";
 import { Table } from "../components/table";
-import type { Club } from "../config/club";
-import { getEditionFromStrings } from "../config/editions";
+import type { ClubStats } from "../config/club";
+import type { Edition } from "../config/editions";
 
 export function CompetitionTablePage() {
   const { competitionID, startYear } = useParams();
-  const edition = getEditionFromStrings(competitionID, startYear);
-  const [clubs, setClubs] = useState<Club[]>([]);
+  const [edition, setEdition] = useState<Edition>();
+  const [clubs, setClubs] = useState<ClubStats[]>([]);
 
   useEffect(() => {
-    if (!edition) {
+    const competitionIdNumber = Number(competitionID);
+    const startYearNumber = Number(startYear);
+
+    if (!Number.isFinite(competitionIdNumber) || !Number.isFinite(startYearNumber)) {
+      setEdition(undefined);
+      setClubs([]);
       return;
     }
 
-    getTable(edition).then(setClubs).catch(console.error);
-  }, [edition]);
+    setEdition(undefined);
+    setClubs([]);
+
+    GetCompetitionData(competitionIdNumber, startYearNumber)
+      .then((selectedEdition) => {
+        setEdition(selectedEdition);
+        return getTable(selectedEdition);
+      })
+      .then(setClubs)
+      .catch(console.error);
+  }, [competitionID, startYear]);
 
   if (!edition) {
     return <div>Nie znaleziono rozgrywek</div>;
@@ -31,7 +46,7 @@ export function CompetitionTablePage() {
         <CompetitionTitle {...edition} />
       </div>
       <div className="flex justify-center">
-        <Table clubs={clubs} />
+        <Table clubs={clubs} isCurrent={edition.isCurrent} />
       </div>
     </main>
   );
