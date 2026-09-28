@@ -34,10 +34,11 @@ func initClub(club *Club, team *database.Team, matches map[int]map[int]database.
 		return club
 	}
 	club = &Club{
-		TeamID:   team.TeamID,
-		TeamName: team.FullName,
-		TeamCode: team.Code,
-		Form:     make([]MatchResult, 0),
+		TeamID:       team.TeamID,
+		TeamName:     team.FullName,
+		TeamCode:     team.Code,
+		TeamCrestUrl: team.CrestUrl,
+		Form:         make([]MatchResult, 0),
 	}
 	matches[club.TeamID] = make(map[int]database.Match)
 	return club

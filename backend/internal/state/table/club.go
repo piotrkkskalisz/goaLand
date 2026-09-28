@@ -11,9 +11,10 @@ const (
 )
 
 type Club struct {
-	TeamID   int    `json:"teamId"`
-	TeamName string `json:"teamName"`
-	TeamCode string `json:"TeamCode"`
+	TeamID       int    `json:"teamId"`
+	TeamName     string `json:"teamName"`
+	TeamCode     string `json:"TeamCode"`
+	TeamCrestUrl string `json:"teamCrestUrl"`
 
 	Points        int           `json:"points"`
 	Wins          int           `json:"wins"`

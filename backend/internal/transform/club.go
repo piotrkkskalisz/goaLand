@@ -7,6 +7,7 @@ type ExtendedClub struct {
 	TeamID        int                 `json:"id"`
 	TeamName      string              `json:"name"`
 	TeamCode      string              `json:"code"`
+	TeamCrestUrl  string              `json:"crestUrl"`
 	CompetitionID int                 `json:"competitionID"`
 	Points        int                 `json:"points"`
 	Wins          int                 `json:"wins"`
@@ -24,6 +25,7 @@ func createExtendedClub(club *table.Club, position, competitionID int) ExtendedC
 		TeamID:        club.TeamID,
 		TeamName:      club.TeamName,
 		TeamCode:      club.TeamCode,
+		TeamCrestUrl:  club.TeamCrestUrl,
 		CompetitionID: competitionID,
 		Points:        club.Points,
 		Wins:          club.Wins,
