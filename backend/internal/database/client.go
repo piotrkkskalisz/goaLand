@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	PreloadArea         = "Area"
-	PreloadEditions     = "Editions"
-	PreloadMatches      = "Matches"
-	PreloadCompetitions = "Competition"
-	PreloadPlayer       = "Player"
+	PreloadArea        = "Area"
+	PreloadEditions    = "Editions"
+	PreloadMatches     = "Matches"
+	PreloadCompetition = "Competition"
+	PreloadPlayer      = "Player"
 )
 
 var preloadTeams = []string{"HomeTeam", "AwayTeam"}
@@ -137,10 +137,4 @@ func (c *Client) GetSeasonPlayer(ctx context.Context, id int, preloads ...string
 	var scorer SeasonPlayer
 	err := c.Get(ctx, &scorer, Filter{"goal_scorer_id": id}, preloads...)
 	return &scorer, err
-}
-
-func (c *Client) GetEdition(ctx context.Context, competitionID, startYear int, preloads ...string) (*Edition, error) {
-	var edition Edition
-	err := c.Get(ctx, &edition, Filter{"competition_id": competitionID, "start_year": startYear}, preloads...)
-	return &edition, err
 }

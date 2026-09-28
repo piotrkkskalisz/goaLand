@@ -4,8 +4,9 @@ import "backend/internal/state/table"
 
 type ExtendedClub struct {
 	Position      int                 `json:"position"`
-	TeamID        int                 `json:"teamId"`
-	TeamName      string              `json:"teamName"`
+	TeamID        int                 `json:"id"`
+	TeamName      string              `json:"name"`
+	TeamCode      string              `json:"code"`
 	CompetitionID int                 `json:"competitionID"`
 	Points        int                 `json:"points"`
 	Wins          int                 `json:"wins"`
@@ -22,6 +23,7 @@ func createExtendedClub(club *table.Club, position, competitionID int) ExtendedC
 		Position:      position,
 		TeamID:        club.TeamID,
 		TeamName:      club.TeamName,
+		TeamCode:      club.TeamCode,
 		CompetitionID: competitionID,
 		Points:        club.Points,
 		Wins:          club.Wins,

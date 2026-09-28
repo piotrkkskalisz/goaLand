@@ -1,11 +1,12 @@
 import { Link } from "react-router";
-import type { Club } from "../config/club";
+import type { ClubStats } from "../config/club";
 import { createClubPageLink } from "../config/routes";
 
 type TableClubProps = {
-  club: Club;
+  club: ClubStats;
   size?: "small" | "large";
   isSelected?: boolean;
+  isCurrent?: boolean;
 };
 
 const formResult = {
@@ -18,6 +19,7 @@ export function TableClub({
   club,
   size = "large",
   isSelected = false,
+  isCurrent = true,
 }: TableClubProps) {
   const playedMatches = club.wins + club.draws + club.losses;
   const isSmall = size === "small";
@@ -34,9 +36,13 @@ export function TableClub({
           {club.isLive && (
             <span className="h-[8px] w-[8px] rounded-full bg-live" />
           )}
-          <Link to={createClubPageLink(club)}>
-            {club.teamName}
-          </Link>
+          {isCurrent ? (
+            <Link to={createClubPageLink(club.competitionID, club)}>
+              {club.name}
+            </Link>
+          ) : (
+            <span>{club.name}</span>
+          )}
         </span>
       </td>
       {!isSmall && <td>{club.points}</td>}

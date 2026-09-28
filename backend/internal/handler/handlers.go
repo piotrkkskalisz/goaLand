@@ -80,7 +80,7 @@ func (h *Handler) loadEditionMatches(w http.ResponseWriter, r *http.Request,
 
 	competitionID, startYear, err := editionParams(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return nil, false
 	}
 
@@ -98,7 +98,7 @@ func (h *Handler) GetTeamsMatches(w http.ResponseWriter, r *http.Request) {
 
 	teamsID, err := teamParam(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -116,7 +116,7 @@ func (h *Handler) GetClubPlayers(w http.ResponseWriter, r *http.Request) {
 
 	teamID, err := teamParam(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *Handler) GetClubPlayers(w http.ResponseWriter, r *http.Request) {
 
 	competitionID, err := competitionParam(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -148,7 +148,7 @@ func (h *Handler) GetTeamInformation(w http.ResponseWriter, r *http.Request) {
 
 	clubID, err := clubParam(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (h *Handler) GetTeamInformation(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, team)
 }
 
-func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetActiveEdition(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var competitions []database.Competition
@@ -170,7 +170,44 @@ func (h *Handler) GetCompetitionEdition(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response := transform.GetCompetitionEdition(competitions)
+	response := transform.GetActiveEditions(competitions)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+func (h *Handler) GetCompetitionData(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	competitionID, startYear, err := editionParams(r)
+	if err != nil {
+		BadRequest(w)
+		return
+	}
+	edition, err := h.db.GetEdition(ctx, competitionID, startYear, database.PreloadCompetition)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to load editions")
+		return
+	}
+
+	response := transform.CreateEditionResponse(edition.Competition, edition)
+
+	WriteJSON(w, http.StatusOK, response)
+}
+func (h *Handler) GetCompetitionEditions(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	competitionID, err := competitionParam(r)
+	if err != nil {
+		BadRequest(w)
+		return
+	}
+
+	editions, err := h.db.GetEditions(ctx, competitionID, database.PreloadCompetition)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, "failed to load editions")
+		return
+	}
+
+	response := transform.GetEditions(editions)
 
 	WriteJSON(w, http.StatusOK, response)
 }
@@ -180,7 +217,7 @@ func (h *Handler) GetEditionGoalScorers(w http.ResponseWriter, r *http.Request) 
 
 	competitionID, startYear, err := editionParams(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -198,7 +235,7 @@ func (h *Handler) GetEditionGoalScorers(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) GetEditionTable(w http.ResponseWriter, r *http.Request) {
 	competitionID, startYear, err := editionParams(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -215,7 +252,7 @@ func (h *Handler) GetEditionTable(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetClubTable(w http.ResponseWriter, r *http.Request) {
 	clubID, competitionID, startYear, err := clubparams(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -237,7 +274,7 @@ func (h *Handler) getClubMatches(w http.ResponseWriter, r *http.Request,
 
 	clubID, competitionID, startYear, err := clubparams(r)
 	if err != nil {
-		WriteError(w, http.StatusBadRequest, err.Error())
+		BadRequest(w)
 		return
 	}
 
@@ -258,5 +295,4 @@ func (h *Handler) GetClubMatches(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetClubResults(w http.ResponseWriter, r *http.Request) {
 	h.getClubMatches(w, r, h.db.GetEditionResult)
-
 }

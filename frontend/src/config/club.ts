@@ -1,9 +1,12 @@
 export type MatchResult = "win" | "draw" | "loss";
 
 export type Club = {
+  id: number;
+  name: string;
+  code: string,
+}
+export type ClubStats = Club & {
   position: number;
-  teamId: number;
-  teamName: string;
   competitionID: number;
   points: number;
   wins: number;

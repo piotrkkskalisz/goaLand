@@ -35,7 +35,8 @@ export function CompetitionRoundMatchesPage({fetchMatches}: CompetitionRoundMatc
       <CompetitionMatchCard
         key={matches[0].id}
         header={  <MatchWeekHeader  text={roundName(round)} />}
-        matches={matches} 
+        matches={matches}
+        isCurrent={edition.isCurrent}
       />
       ))
     }</div>

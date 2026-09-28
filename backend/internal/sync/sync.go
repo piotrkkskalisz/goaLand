@@ -205,7 +205,7 @@ func (s *Sync) InitAreasFromDB(ctx context.Context) error {
 	}
 
 	var editions []database.Edition
-	err = s.databaseClient.List(ctx, &editions, database.Filter{}, database.PreloadCompetitions)
+	err = s.databaseClient.List(ctx, &editions, database.Filter{}, database.PreloadCompetition)
 	if err != nil {
 		return err
 	}

@@ -1,57 +1,66 @@
-export type Edition = {
+export type Competition = {
   id: number;
   competitionName: string;
+  isCurrent: boolean;
+};
+
+export type Edition = Competition & {
   startYear: number;
 };
 
-export const premierLeagueEdition = {
+
+export const premierLeagueCompetition = {
   id: 2021,
   competitionName: "Premier League",
-  startYear: 2026,
 } as const;
 
-export const laLigaEdition = {
+export const laLigaCompetition = {
   id: 2014,
   competitionName: "La Liga",
-  startYear: 2026,
 } as const;
 
-export const bundesligaEdition = {
+export const bundesligaCompetition = {
   id: 2002,
   competitionName: "Bundesliga",
-  startYear: 2026,
 } as const;
 
-export const serieAEdition = {
+export const serieACompetition = {
   id: 2019,
   competitionName: "Serie A",
-  startYear: 2026,
 } as const;
 
-export const ligue1Edition = {
+export const ligue1Competition = {
   id: 2015,
   competitionName: "Ligue 1",
-  startYear: 2026,
 } as const;
 
-export const mainEditions = [
-  premierLeagueEdition,
-  laLigaEdition,
-  bundesligaEdition,
-  serieAEdition,
-  ligue1Edition,
+export const mainCompetitions = [
+  premierLeagueCompetition,
+  laLigaCompetition,
+  bundesligaCompetition,
+  serieACompetition,
+  ligue1Competition,
 ] as const;
 
+/*
 export function getEditionFromStrings(
   competitionID: string | undefined,
   startYear: string | undefined){
   return getEdition(Number(competitionID), Number(startYear) );
 }
 
-export function getEdition(competitionID: number, startYear: number){
-  return mainEditions.find(
-    (edition) =>
-      edition.id === competitionID &&
-      edition.startYear === startYear,
+export function getEdition(competitionID: number, startYear: number): Edition | undefined {
+  const competition = mainCompetitions.find(
+    (competition) => competition.id === competitionID,
   );
+
+  if (!competition) {
+    return undefined;
+  }
+
+  return {
+    ...competition,
+    startYear,
+  };
 }
+*/

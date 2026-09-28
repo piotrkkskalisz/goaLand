@@ -1,5 +1,6 @@
+import { Link } from "react-router";
 import type { Edition } from "../config/editions";
-import { toFlag } from "../config/editions-with-flags";
+import { toFlag } from "../config/flags";
 
 export function LeagueHeader(props: Edition) {
   return (
@@ -9,7 +10,9 @@ export function LeagueHeader(props: Edition) {
         className="h-[25px] w-[35px]"
         style={{ background: toFlag(props) }}
       />
-      <span>{props.competitionName}</span>
+      <Link to={`/${props.id}/${props.startYear}/wyniki`} className="hover:text-granit-200">
+        {props.competitionName}
+      </Link>
     </header>
   );
 }

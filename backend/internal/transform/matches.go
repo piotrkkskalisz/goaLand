@@ -6,19 +6,22 @@ import (
 	"slices"
 )
 
+type ClubResponse struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
 type MatchResponse struct {
-	MatchID int `json:"id"`
+	MatchID       int `json:"id"`
+	CompetitionID int `json:"competitionID"`
 
 	StartDate string `json:"date"`
 	StartTime string `json:"time"`
 
 	Status string `json:"status"`
 
-	HomeTeam string `json:"homeTeam"`
-	AwayTeam string `json:"awayTeam"`
-
-	HomeTeamCode string `json:"homeTeamCode"`
-	AwayTeamCode string `json:"awayTeamCode"`
+	HomeTeam ClubResponse `json:"homeTeam"`
+	AwayTeam ClubResponse `json:"awayTeam"`
 
 	HomeScore *int `json:"homeScore,omitempty"`
 	AwayScore *int `json:"awayScore,omitempty"`
@@ -53,18 +56,24 @@ func matchStatus(status string) string {
 
 func createMatchResponse(match database.Match) MatchResponse {
 	return MatchResponse{
-		MatchID: match.MatchID,
+		MatchID:       match.MatchID,
+		CompetitionID: match.CompetitionID,
 
 		StartTime: match.StartTime.Format("15:04"),
 		StartDate: match.StartTime.Format("02.01.2006"),
 
 		Status: matchStatus(match.Status),
 
-		HomeTeam: match.HomeTeam.FullName,
-		AwayTeam: match.AwayTeam.FullName,
-
-		HomeTeamCode: match.HomeTeam.Code,
-		AwayTeamCode: match.AwayTeam.Code,
+		HomeTeam: ClubResponse{
+			ID:   match.HomeTeamID,
+			Name: match.HomeTeam.FullName,
+			Code: match.HomeTeam.Code,
+		},
+		AwayTeam: ClubResponse{
+			ID:   match.AwayTeamID,
+			Name: match.AwayTeam.FullName,
+			Code: match.AwayTeam.Code,
+		},
 
 		HomeScore: match.HomeGoals,
 		AwayScore: match.AwayGoals,

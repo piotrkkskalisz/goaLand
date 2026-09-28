@@ -1,27 +1,34 @@
 import type { ReactNode } from "react";
 import type { MatchData } from "../config/matches";
+import { createClubPageLink } from "../config/routes";
+import type { Club } from "../config/club";
+import { Link } from "react-router";
 
 type winner = "team1" | "team2";
 
 type TopMatchProps = {
-  team1: string;
-  team2: string;
+  competitionID: number;
+  homeTeam: Club;
+  awayTeam: Club;
+  homeTeamString: string;
+  awayTeamString: string;
   winner?: winner
   separator: string;
   children: ReactNode;
 };
 
-function TopMatch({team1, team2, winner, separator, children}: TopMatchProps) {
+function TopMatch({competitionID, homeTeam, awayTeam, homeTeamString, awayTeamString, 
+  winner, separator, children}: TopMatchProps) {
   return (
     <div className="h-[48px] w-[128px] shrink-0 flex flex-col items-center -space-y-[2px]">
       <div className="text-secondary relative flex w-[128px]  h-[20px] items-center justify-center rounded-[5px]  bg-sections">
-        <span className={winner === "team1" ? "font-bold" : undefined}>
-          {team1}
-        </span>
+        <Link to={createClubPageLink(competitionID, homeTeam)} className={winner === "team1" ? "font-bold" : undefined}>
+          {homeTeamString}
+        </Link>
         {separator}
-        <span className={winner === "team2" ? "font-bold" : undefined}>
-          {team2}
-        </span>
+        <Link to={createClubPageLink(competitionID, awayTeam)}className={winner === "team2" ? "font-bold" : undefined}>
+          {awayTeamString}
+        </Link>
       </div>
       <div className="flex h-[30px] w-[80px] items-center justify-center leading-[13px] bg-sections [clip-path:polygon(0_0,100%_0,87.5%_100%,12.5%_100%)]">
         <div className="text-third text-center">{children}</div>
@@ -31,30 +38,35 @@ function TopMatch({team1, team2, winner, separator, children}: TopMatchProps) {
 }
 
 
-export function UpcomingMatch({homeTeamCode, awayTeamCode, date, time,
+
+export function UpcomingMatch({competitionID, homeTeam, awayTeam, date, time,
 }: MatchData) {
   return (
-    <TopMatch team1={homeTeamCode} separator=" - " team2={awayTeamCode}>
+    <TopMatch competitionID={competitionID} homeTeam={homeTeam} homeTeamString={homeTeam.code} separator=" - " 
+      awayTeam={awayTeam} awayTeamString={awayTeam.code}>
       <div>{date}</div>
       <div>{time}</div>
     </TopMatch>
   );
 }
 
-export function LiveMatch({homeTeamCode, awayTeamCode, homeScore, awayScore,
+export function LiveMatch({competitionID, homeTeam, awayTeam, homeScore, awayScore,
 }: MatchData) {
   return (
     <TopMatch
-      team1={`${homeTeamCode} ${homeScore}`}
+      competitionID={competitionID}
+      homeTeam={homeTeam}
+      homeTeamString={`${homeTeam.code} ${homeScore}`}
       separator=" : "
-      team2={`${awayScore} ${awayTeamCode}`}
+      awayTeam={awayTeam}
+      awayTeamString={`${awayScore} ${awayTeam.code}`}
     >
       <span className="text-third text-red-600">trwa</span>
     </TopMatch>
   );
 }
 
-export function FinishedMatch({homeTeamCode, awayTeamCode, homeScore, awayScore,
+export function FinishedMatch({competitionID, homeTeam, awayTeam, homeScore, awayScore,
 }: MatchData) {
   let matchWinner: winner | undefined
   if (homeScore! > awayScore!){
@@ -66,9 +78,12 @@ export function FinishedMatch({homeTeamCode, awayTeamCode, homeScore, awayScore,
 
   return (
     <TopMatch
-      team1={`${homeTeamCode} ${homeScore}`}
+      competitionID={competitionID}
+      homeTeam={homeTeam}
+      homeTeamString={`${homeTeam.code} ${homeScore}`}
       separator=" : "
-      team2={`${awayScore} ${awayTeamCode}`}
+      awayTeam={awayTeam}
+      awayTeamString={`${awayScore} ${awayTeam.code}`}
       winner={matchWinner}
     >
       <span className="text-third"> koniec </span>

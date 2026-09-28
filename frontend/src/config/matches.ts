@@ -1,13 +1,15 @@
+import type { Club } from "./club";
+
 export type MatchData = {
   id: number;
+  competitionID: number;
+
   date: string;
   time: string;
   status: "scheduled" | "live" | "finished";
-  homeTeam: string;
-  awayTeam: string;
   
-  homeTeamCode: string;
-  awayTeamCode: string;
+  homeTeam: Club;
+  awayTeam: Club;
 
   homeScore?: number;
   awayScore?: number;
