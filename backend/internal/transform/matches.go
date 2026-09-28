@@ -7,9 +7,10 @@ import (
 )
 
 type ClubResponse struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Code string `json:"code"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Code     string `json:"code"`
+	CrestUrl string `json:"crestUrl"`
 }
 type MatchResponse struct {
 	MatchID       int `json:"id"`
@@ -65,14 +66,16 @@ func createMatchResponse(match database.Match) MatchResponse {
 		Status: matchStatus(match.Status),
 
 		HomeTeam: ClubResponse{
-			ID:   match.HomeTeamID,
-			Name: match.HomeTeam.FullName,
-			Code: match.HomeTeam.Code,
+			ID:       match.HomeTeamID,
+			Name:     match.HomeTeam.FullName,
+			Code:     match.HomeTeam.Code,
+			CrestUrl: match.HomeTeam.CrestUrl,
 		},
 		AwayTeam: ClubResponse{
-			ID:   match.AwayTeamID,
-			Name: match.AwayTeam.FullName,
-			Code: match.AwayTeam.Code,
+			ID:       match.AwayTeamID,
+			Name:     match.AwayTeam.FullName,
+			Code:     match.AwayTeam.Code,
+			CrestUrl: match.AwayTeam.CrestUrl,
 		},
 
 		HomeScore: match.HomeGoals,

@@ -253,6 +253,7 @@ func (s *Sync) initTeams(ctx context.Context, now time.Time, season Season) erro
 			ShortName: team.ShortName,
 			Stadium:   team.Venue,
 			Code:      team.TLA,
+			CrestUrl:  team.CrestUrl,
 			Colors:    team.ClubColors,
 			AreaID:    team.Area.ID,
 		})

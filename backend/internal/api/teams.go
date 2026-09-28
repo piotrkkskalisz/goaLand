@@ -17,6 +17,7 @@ type Team struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	ShortName  string `json:"shortName"`
+	CrestUrl   string `json:"crest"`
 	TLA        string `json:"tla"`
 	ClubColors string `json:"clubColors"`
 
